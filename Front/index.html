@@ -16,7 +16,7 @@
         Введите первое число
         <input id="first"></input>
         Введите второе число
-        <input id="second"></input>
+        <input id="second" ></input>
         Выберите операцию
         <div>
             <button type="button" class="btn btn-primary" id="buttonPlus">+</button>
@@ -24,8 +24,15 @@
             <button type="button" class="btn btn-primary" id="buttonMulti">*</button>
             <button type="button" class="btn btn-primary" id="buttonDiv">/</button>
         </div>
+        Выберите тип данных
+        <div>
+            <select id="type" class="form-select" >
+                <option value="int">Число</option>
+                <option value="string">Строка</option>
+            </select>
+        </div>
         Результат
-        <input id="res"></input>
+        <input id="res" type="text"></input>
     </div>
 </form>
 <script src="/script.js"></script>

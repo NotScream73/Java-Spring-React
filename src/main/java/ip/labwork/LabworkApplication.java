@@ -12,7 +12,7 @@ public class LabworkApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(LabworkApplication.class, args);
 	}
-
+/*
 	@GetMapping("/hello")
 	public String hello(@RequestParam(value = "name", defaultValue = "World") String name) {
 		return String.format("Hello %s!", name);
@@ -43,5 +43,5 @@ public class LabworkApplication {
 			return null;
 		}
 		return Double.toString(first / second);
-	}
+	}*/
 }
