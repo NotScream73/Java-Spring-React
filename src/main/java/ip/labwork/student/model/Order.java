@@ -2,30 +2,38 @@ package ip.labwork.student.model;
 
 import jakarta.persistence.*;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+
 @Entity
-public class Ord {
+@Table(name="tab_order")
+public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @Temporal(TemporalType.DATE)
     private Date CreateDate;
     private Integer Count;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "ords_product",
             joinColumns = @JoinColumn(name = "ord_fk"),
             inverseJoinColumns = @JoinColumn(name = "product_fk"))
     private List<Product> products;
-    public Ord() {
+    public Order() {
     }
 
-    public Ord(Date CreateDate, Integer Count) {
+    public Order(Date CreateDate, Integer Count) {
         this.CreateDate = CreateDate;
         this.Count = Count;
     }
-
+    public void addProduct(Product product) {
+        if (products == null){
+            products = new ArrayList<>();
+        }
+        this.products.add(product);
+        if (product.getOrder() == null) {
+            product.setOrder(this);
+        }
+    }
     public Long getId() {
         return id;
     }
@@ -50,7 +58,7 @@ public class Ord {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Ord ord = (Ord) o;
+        Order ord = (Order) o;
         return Objects.equals(id, ord.id);
     }
 
@@ -66,5 +74,9 @@ public class Ord {
                 ", CreateDate='" + CreateDate + '\'' +
                 ", Count='" + Count + '\'' +
                 '}';
+    }
+
+    public List<Product> getProducts() {
+        return products;
     }
 }

@@ -3,7 +3,6 @@ package ip.labwork.student.model;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -22,7 +21,7 @@ public class Product {
     private List<Component> components;
 
     @ManyToMany(mappedBy = "products", fetch = FetchType.EAGER)
-    private List<Ord> ords;
+    private List<Order> ords;
     public void addComponent(Component component) {
         if (components == null){
             components = new ArrayList<>();
@@ -84,5 +83,23 @@ public class Product {
 
     public List<Component> getComponents() {
         return components;
+    }
+
+    public List<Order> getOrder() {
+        /*if(products.contains(product)){
+            return true;
+        }else{
+            return false;
+        }*/
+        return ords;
+    }
+    public void setOrder(Order order) {
+        if (ords == null){
+            ords = new ArrayList<>();
+        }
+        this.ords.add(order);
+        if (!order.getProducts().contains(this)) { // warning this may cause performance issues if you have a large data set since this operation is O(n)
+            order.getProducts().add(this);
+        }
     }
 }

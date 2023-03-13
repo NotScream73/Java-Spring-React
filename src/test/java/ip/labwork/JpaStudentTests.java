@@ -1,7 +1,7 @@
 package ip.labwork;
 
 import ip.labwork.student.model.Component;
-import ip.labwork.student.model.Ord;
+import ip.labwork.student.model.Order;
 import ip.labwork.student.model.Product;
 import ip.labwork.student.service.ComponentService;
 import ip.labwork.student.service.OrdService;
@@ -85,18 +85,16 @@ public class JpaStudentTests {
         final Product product = productService.addProduct("Бургер", 300, components);
         log.info(product.toString());
         final Product product1 = productService.findProduct(product.getId());
-        Assertions.assertEquals(true,product1.getComponents().contains(component1));
+
+        Assertions.assertTrue(product1.getComponents().contains(component1));
         Assertions.assertEquals(product,product1);
 
-
-        Assertions.assertEquals(product1.getComponents().size(), 3);
-
-
         productService.deleteAllProduct();
+        Assertions.assertEquals(productService.findAllProduct().size(), 0);
         Assertions.assertThrows(EntityNotFoundException.class, () -> productService.findProduct(-1L));
     }
 
-    /*@Test
+   /* @Test
     void testProductRead() {
         productService.deleteAllProduct();
         final Product product = productService.addProduct("Бургер", 300);
@@ -104,8 +102,8 @@ public class JpaStudentTests {
         final Product findProduct = productService.findProduct(product.getId());
         log.info(findProduct.toString());
         Assertions.assertEquals(product, findProduct);
-    }*/
-
+    }
+*/
     @Test
     void testProductReadNotFound() {
         productService.deleteAllProduct();
@@ -129,16 +127,38 @@ public class JpaStudentTests {
         log.info(products.toString());
         Assertions.assertEquals(products.size(), 0);
     }
-    /*
     @Test
     void testOrderCreate() {
+        productService.deleteAllProduct();
+        componentService.deleteAllComponent();
         ordService.deleteAllOrd();
-        final Ord ord = ordService.addOrd(new Date(), 3);
-        log.info(ord.toString());
-        Assertions.assertNotNull(ord.getId());
-    }
+        final Component component1 = componentService.addComponent("Помидор", 3);
+        final Component component2 = componentService.addComponent("Булочка", 2);
+        final Component component3 = componentService.addComponent("Огурец", 3);
+        ArrayList<Component> components = new ArrayList<>();
 
-    @Test
+        components.add(component1);
+        components.add(component2);
+        components.add(component3);
+        final Product product = productService.addProduct("Бургер", 300, components);
+        ArrayList<Product> products = new ArrayList<>();
+        products.add(product);
+        final Order ord = ordService.addOrd(new Date(), 3, products);
+        ordService.addOrd(new Date(), 4,products);
+        ordService.addOrd(new Date(), 5,products);
+        ordService.addOrd(new Date(), 6,products);
+        log.info(ord.toString());
+        Assertions.assertEquals(3, ordService.findOrd(ord.getId()).getProducts().get(0).getComponents().size());
+        Assertions.assertEquals(1, ordService.findOrd(ord.getId()).getProducts().size());
+        Assertions.assertEquals(4, ordService.findAllOrd().size());
+        final Order ord1 = ordService.findOrd(ord.getId());
+        Assertions.assertEquals(ord1, ord);
+
+        ordService.deleteAllOrd();
+        Assertions.assertThrows(EntityNotFoundException.class, () -> ordService.findOrd(-1L));
+        Assertions.assertEquals(0, ordService.findAllOrd().size());
+    }
+    /*@Test
     void testOrderRead() {
         ordService.deleteAllOrd();
         final Ord Order = ordService.addOrd(new Date(), 3);
@@ -146,9 +166,9 @@ public class JpaStudentTests {
         final Ord findOrder = ordService.findOrd(Order.getId());
         log.info(findOrder.toString());
         Assertions.assertEquals(Order, findOrder);
-    }
+    }*/
 
-    @Test
+  /*  @Test
     void testOrderReadNotFound() {
         ordService.deleteAllOrd();
         Assertions.assertThrows(EntityNotFoundException.class, () -> ordService.findOrd(-1L));
@@ -162,13 +182,27 @@ public class JpaStudentTests {
         final List<Ord> Orders = ordService.findAllOrd();
         log.info(Orders.toString());
         Assertions.assertEquals(Orders.size(), 2);
-    }
+    }*/
 
     @Test
     void testOrderReadAllEmpty() {
+        productService.deleteAllProduct();
+        componentService.deleteAllComponent();
         ordService.deleteAllOrd();
-        final List<Ord> Orders = ordService.findAllOrd();
-        log.info(Orders.toString());
-        Assertions.assertEquals(Orders.size(), 0);
-    }*/
+        final Component component1 = componentService.addComponent("Помидор", 3);
+        final Component component2 = componentService.addComponent("Булочка", 2);
+        final Component component3 = componentService.addComponent("Огурец", 3);
+        ArrayList<Component> components = new ArrayList<>();
+
+        components.add(component1);
+        components.add(component2);
+        components.add(component3);
+        final Product product = productService.addProduct("Бургер", 300, components);
+        ArrayList<Product> products = new ArrayList<>();
+        products.add(product);
+        final Order ord = ordService.addOrd(new Date(), 3, products);
+        Assertions.assertEquals(ordService.findAllOrd().size(), 1);
+        ordService.deleteOrd(ord.getId());
+        Assertions.assertEquals(ordService.findAllOrd().size(), 0);
+    }
 }
