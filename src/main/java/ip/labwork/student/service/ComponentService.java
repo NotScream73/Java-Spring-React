@@ -36,18 +36,18 @@ public class ComponentService {
 
     @Transactional(readOnly = true)
     public List<Component> findAllComponent() {
-        return em.createQuery("select s from Component s", Component.class)
+        return em.createQuery("select c from Component c", Component.class)
                 .getResultList();
     }
 
     @Transactional
     public Component updateComponent(Long id, String ComponentName, Integer Count) {
-        if (!StringUtils.hasText(ComponentName) || Count != 0) {
+        if (!StringUtils.hasText(ComponentName) || Count == 0) {
             throw new IllegalArgumentException("Component is null or empty");
         }
         final Component currentComponent = findComponent(id);
         currentComponent.setComponentName(ComponentName);
-        currentComponent.setCount(Count);
+        currentComponent.setPrice(Count);
         return em.merge(currentComponent);
     }
 
@@ -57,7 +57,10 @@ public class ComponentService {
         em.remove(currentComponent);
         return currentComponent;
     }
-
+    @Transactional
+    public void check(){
+        int s = 5;
+    }
     @Transactional
     public void deleteAllComponent() {
         em.createQuery("delete from Component").executeUpdate();

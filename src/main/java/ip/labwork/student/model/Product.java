@@ -2,41 +2,28 @@ package ip.labwork.student.model;
 
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @Column()
-    private String ProductName;
-    private Integer Price;
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "products_component",
-            joinColumns = @JoinColumn(name = "product_fk"),
-            inverseJoinColumns = @JoinColumn(name = "component_fk"))
-    private List<Component> components;
+    private String productName;
+    private Integer price;
 
-    @ManyToMany(mappedBy = "products", fetch = FetchType.EAGER)
-    private List<Order> ords;
-    public void addComponent(Component component) {
-        if (components == null){
-            components = new ArrayList<>();
-        }
-        this.components.add(component);
-        if (component.getProduct() == null) {
-            component.setProduct(this);
-        }
-    }
-    public Product() {
-    }
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private Set<ProductComponents> components = new HashSet<>();
 
-    public Product(String ProductName, Integer Price) {
-        this.ProductName = ProductName;
-        this.Price = Price;
+    public Product(){
+
+    }
+    public Product(String productName, Integer price, Set<ProductComponents> components) {
+        this.productName = productName;
+        this.price = price;
+        this.components = components;
     }
 
     public Long getId() {
@@ -44,21 +31,41 @@ public class Product {
     }
 
     public String getProductName() {
-        return ProductName;
+        return productName;
     }
 
-    public void setProductName(String ProductName) {
-        this.ProductName = ProductName;
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 
     public Integer getPrice() {
-        return Price;
+        return price;
     }
 
-    public void setPrice(Integer Price) {
-        this.Price = Price;
+    public void setPrice(Integer price) {
+        this.price = price;
     }
 
+    public Set<ProductComponents> getComponents() {
+        return components;
+    }
+
+    public void setComponents(Set<ProductComponents> components) {
+        this.components = components;
+    }
+
+    public void update(Product product){
+        this.productName = product.productName;
+        this.price = product.price;
+        this.components = product.getComponents();
+    }
+
+    public void addComponent(ProductComponents productComponents){
+        this.components.add(productComponents);
+    }
+    public void removeComponent(ProductComponents productComponents){
+        this.components.remove(productComponents);
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -76,30 +83,8 @@ public class Product {
     public String toString() {
         return "Product{" +
                 "id=" + id +
-                ", ProductName='" + ProductName + '\'' +
-                ", Price='" + Price + '\'' +
+                ", productName='" + productName + '\'' +
+                ", price='" + price + '\'' +
                 '}';
-    }
-
-    public List<Component> getComponents() {
-        return components;
-    }
-
-    public List<Order> getOrder() {
-        /*if(products.contains(product)){
-            return true;
-        }else{
-            return false;
-        }*/
-        return ords;
-    }
-    public void setOrder(Order order) {
-        if (ords == null){
-            ords = new ArrayList<>();
-        }
-        this.ords.add(order);
-        if (!order.getProducts().contains(this)) { // warning this may cause performance issues if you have a large data set since this operation is O(n)
-            order.getProducts().add(this);
-        }
     }
 }

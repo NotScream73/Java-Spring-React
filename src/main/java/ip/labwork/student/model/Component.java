@@ -1,11 +1,10 @@
 package ip.labwork.student.model;
 
-import ip.labwork.student.service.ProductService;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 public class Component {
@@ -13,18 +12,18 @@ public class Component {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @Column()
-    private String ComponentName;
-    private Integer Count;
-    @ManyToMany(mappedBy = "components", fetch = FetchType.EAGER)
-    private List<Product> products;
+    private String componentName;
+    private Integer price;
 
-
+    @OneToMany(mappedBy = "component", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<ProductComponents> products;
     public Component() {
     }
 
-    public Component(String ComponentName, Integer Count) {
-        this.ComponentName = ComponentName;
-        this.Count = Count;
+    public Component(String componentName, Integer price) {
+        this.componentName = componentName;
+        this.price = price;
     }
 
     public Long getId() {
@@ -32,35 +31,27 @@ public class Component {
     }
 
     public String getComponentName() {
-        return ComponentName;
+        return componentName;
     }
 
-    public void setComponentName(String ComponentName) {
-        this.ComponentName = ComponentName;
+    public void setComponentName(String componentName) {
+        this.componentName = componentName;
     }
-    public List<Product> getProduct() {
-        /*if(products.contains(product)){
-            return true;
-        }else{
-            return false;
-        }*/
+
+    public Integer getPrice() {
+        return price;
+    }
+
+    public void setPrice(Integer price) {
+        this.price = price;
+    }
+
+    public Set<ProductComponents> getProducts() {
         return products;
     }
-    public void setProduct(Product product) {
-        if (products == null){
-            products = new ArrayList<>();
-        }
-        this.products.add(product);
-        if (!product.getComponents().contains(this)) { // warning this may cause performance issues if you have a large data set since this operation is O(n)
-            product.getComponents().add(this);
-        }
-    }
-    public Integer getCount() {
-        return Count;
-    }
 
-    public void setCount(Integer Count) {
-        this.Count = Count;
+    public void setProducts(Set<ProductComponents> products) {
+        this.products = products;
     }
 
     @Override
@@ -80,8 +71,8 @@ public class Component {
     public String toString() {
         return "Component{" +
                 "id=" + id +
-                ", ComponentName='" + ComponentName + '\'' +
-                ", Count='" + Count + '\'' +
+                ", componentName='" + componentName + '\'' +
+                ", price='" + price + '\'' +
                 '}';
     }
 }
