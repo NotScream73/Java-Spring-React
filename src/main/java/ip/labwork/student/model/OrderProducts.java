@@ -4,45 +4,45 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
-public class ProductComponents {
+public class OrderProducts {
     @EmbeddedId
-    private ProductComponentsKey id;
-    @ManyToOne
-    @MapsId("componentId")
-    @JoinColumn(name = "component_id")
-    private Component component;
+    private OrderProductsKey id;
     @ManyToOne
     @MapsId("productId")
     @JoinColumn(name = "product_id")
-    @JsonIgnore
     private Product product;
+    @ManyToOne
+    @MapsId("orderId")
+    @JoinColumn(name = "order_id")
+    @JsonIgnore
+    private Order order;
     private Integer count;
-    public ProductComponents() {
+    public OrderProducts() {
     }
 
-    public ProductComponents(Component component, Product product, Integer count) {
-        this.component = component;
-        this.id = new ProductComponentsKey(product.getId(), component.getId());
-        this.id.setComponentId(component.getId());
+    public OrderProducts(Order order, Product product, Integer count) {
+        this.order = order;
+        this.id = new OrderProductsKey(product.getId(), order.getId());
+        this.id.setOrderId(order.getId());
         this.id.setProductId(product.getId());
         this.product = product;
         this.count = count;
     }
 
-    public ProductComponentsKey getId() {
+    public OrderProductsKey getId() {
         return id;
     }
 
-    public void setId(ProductComponentsKey id) {
+    public void setId(OrderProductsKey id) {
         this.id = id;
     }
 
-    public Component getComponent() {
-        return component;
+    public Order getOrder() {
+        return order;
     }
 
-    public void setComponent(Component component) {
-        this.component = component;
+    public void setOrder(Order order) {
+        this.order = order;
     }
 
     public Product getProduct() {

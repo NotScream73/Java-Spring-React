@@ -12,8 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -21,25 +19,12 @@ public class ProductService {
     private EntityManager em;
 
     @Transactional
-    public Product addProduct(String productName, Integer price, Set<ProductComponents> components){
-        Product product = new Product(productName,price,components);
-        Product newProduct = new Product();
-        newProduct.setProductName(product.getProductName());
-        newProduct.setPrice(product.getPrice());
-        newProduct.getComponents().addAll((product.getComponents()
-                .stream()
-                .map(productComponents -> {
-                    Component component = em.find(Component.class, productComponents.getComponent().getId());
-                    ProductComponents newProductComponents = new ProductComponents();
-                    newProductComponents.setComponent(component);
-                    newProductComponents.setProduct(newProduct);
-                    newProductComponents.setCount(productComponents.getCount());
-                    return newProductComponents;
-                })
-                .collect(Collectors.toSet())
-        ));
-        em.persist(newProduct);
-        return newProduct;
+    public Product addProduct(String productName, Integer price){
+        Product product = new Product();
+        product.setProductName(productName);
+        product.setPrice(price);
+        em.persist(product);
+        return product;
     }
     @Transactional(readOnly = true)
     public Product findProduct(Long id) {
@@ -52,15 +37,12 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public List<Product> findAllProduct() {
-        return em.createQuery("select s from Product s", Product.class)
+        return em.createQuery("select p from Product p", Product.class)
                 .getResultList();
     }
 
     @Transactional
     public Product updateProduct(Long id, String ProductName, Integer Count) {
-        if (!StringUtils.hasText(ProductName) || Count != 0) {
-            throw new IllegalArgumentException("Product is null or empty");
-        }
         final Product currentProduct = findProduct(id);
         currentProduct.setProductName(ProductName);
         currentProduct.setPrice(Count);

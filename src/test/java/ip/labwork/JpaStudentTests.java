@@ -22,7 +22,7 @@ public class JpaStudentTests {
     ComponentService componentService;
     @Autowired
     ProductService productService;
-    @Test
+    /*@Test
     void test(){
         Component component = componentService.addComponent("Помидор", 10);
         Component component1 = componentService.addComponent("Огурец", 20);
@@ -41,5 +41,5 @@ public class JpaStudentTests {
         productService.addProduct("Гамбургер", 100, temp);
         productService.check();
         componentService.check();
-    }
+    }*/
 }

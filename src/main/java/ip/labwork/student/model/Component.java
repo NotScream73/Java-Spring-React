@@ -3,8 +3,9 @@ package ip.labwork.student.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 public class Component {
@@ -17,7 +18,7 @@ public class Component {
 
     @OneToMany(mappedBy = "component", cascade = CascadeType.ALL)
     @JsonIgnore
-    private Set<ProductComponents> products;
+    private List<ProductComponents> products;
     public Component() {
     }
 
@@ -46,14 +47,24 @@ public class Component {
         this.price = price;
     }
 
-    public Set<ProductComponents> getProducts() {
+    public List<ProductComponents> getProducts() {
         return products;
     }
 
-    public void setProducts(Set<ProductComponents> products) {
+    public void setProducts(List<ProductComponents> products) {
         this.products = products;
     }
-
+    public void addProduct(ProductComponents productComponents){
+        if (products == null){
+            products = new ArrayList<>();
+        }
+        if (!products.contains(productComponents))
+            this.products.add(productComponents);
+    }
+    public void removeProduct(ProductComponents productComponents){
+        if (products.contains(productComponents))
+            this.products.remove(productComponents);
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
