@@ -50,10 +50,9 @@ public class OrderController {
                         @RequestParam("count") Integer[] count,
                         @RequestParam("prod") Long[] prod){
         orderService.updateOrder(id, date, price);
-        orderProductsService.removeAll(id, prod);
         Order order = orderService.findOrder(id);
         for(int i = 0; i < prod.length; i++){
-            orderProductsService.addOrderProducts(order, productService.findProduct(prod[i]),count[i]);
+            orderProductsService.update(order, productService.findProduct(prod[i]),count[i], prod);
         }
         return order;
     }

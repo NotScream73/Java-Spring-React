@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,33 +29,12 @@ public class ProductComponentsService {
         return productComponents;
     }
 
-   /* @Transactional(readOnly = true)
-    public Component findProductComponent(Long productId, Long componentId) {
-        em.find(Product.class, id);
-        List<ProductComponents> productComponentsList = em.createQuery("select pc from ProductComponents pc", ProductComponents.class)
-                .getResultList();
-        final ProductComponentsKey productComponentsKey = new ProductComponentsKey(id,)
-        final ProductComponents productComponents = em.find(ProductComponents.class, id);
-        if (component == null) {
-            throw new EntityNotFoundException(String.format("Component with id [%s] is not found", id));
-        }
-        return component;
-    }*/
-
     @Transactional(readOnly = true)
     public List<ProductComponents> findAllProductComponents(Long id) {
         return em.createQuery("select p from ProductComponents p where id.productId = " + id, ProductComponents.class)
                 .getResultList();
     }
 
-   /* @Transactional
-    public ProductComponents updateProduct(Product product, Component component, Integer Count) {
-
-        //final Component currentComponent = fin(id);
-        currentComponent.setComponentName(ProductName);
-        currentComponent.setPrice(Count);
-        return em.merge(currentComponent);
-    }*/
     @Transactional
     public void deleteProduct(Product product) {
         int size = product.getComponents().size();
@@ -71,13 +51,43 @@ public class ProductComponentsService {
     }
     @Transactional
     public void removeAll(Long id, Long[] compid) {
-        /*em.createQuery("delete from ProductComponents p where p.id.productId = " + id + " and p.id.componentId not in "+ compid).executeUpdate();
-        Product product = em.find(Product.class, id);
-        product.getComponents().clear();
-        int s = 5;*/
         List<ProductComponents> temp = findAllProductComponents(id);
         for(int i = 0; i < temp.size(); i++){
             em.remove(temp.get(i));
+        }
+    }
+    @Transactional
+    public void update(Product product, Component component, Integer count, Long[] comp) {
+        for (int i = 0; i < comp.length; i++){
+            List<ProductComponents> tem = em.createQuery("select p from ProductComponents p where p.id.productId = " + product.getId() + " and p.id.componentId = " + component.getId(), ProductComponents.class)
+                    .getResultList();
+            if (tem.size() != 0){
+                final ProductComponents productComponents = tem.get(0);
+                productComponents.setCount(count);
+                em.merge(productComponents);
+            }else{
+                final ProductComponents productComponents = new ProductComponents(component, product, count);
+                product.addComponent(productComponents);
+                component.addProduct(productComponents);
+                em.persist(productComponents);
+            }
+        }
+        List<ProductComponents> newList = em.createQuery("select p from ProductComponents p where p.id.productId = " + product.getId(), ProductComponents.class).getResultList();
+
+        for(int i =0; i < newList.size(); i++){
+            boolean flag = false;
+            for (int j = 0; j < comp.length; j++){
+
+                if (Objects.equals(newList.get(i).getId().getComponentId(), comp[j])) {
+                    flag = true;
+                    break;
+                }
+            }
+            if (!flag){
+                newList.get(i).getComponent().removeProduct(newList.get(i));
+                newList.get(i).getProduct().removeComponent(newList.get(i));
+                em.remove(newList.get(i));
+            }
         }
     }
 }

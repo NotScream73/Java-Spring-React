@@ -43,10 +43,10 @@ public class ProductController {
                           @RequestParam("count") Integer[] count,
                           @RequestParam("comp") Long[] comp){
         productService.updateProduct(id, name, price);
-        productComponentsService.removeAll(id, comp);
+
         Product product = productService.findProduct(id);
         for(int i = 0; i < comp.length; i++){
-            productComponentsService.addProductComponents(product, componentService.findComponent(comp[i]),count[i]);
+            productComponentsService.update(product, componentService.findComponent(comp[i]),count[i], comp);
         }
         return product;
     }

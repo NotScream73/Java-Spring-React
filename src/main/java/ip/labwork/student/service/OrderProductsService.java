@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class OrderProductsService {
@@ -72,6 +73,40 @@ public class OrderProductsService {
         List<OrderProducts> temp = findAllOrderProducts(id);
         for(int i = 0; i < temp.size(); i++){
             em.remove(temp.get(i));
+        }
+    }
+
+    public void update(Order order, Product product, Integer count, Long[] prod) {
+        for (int i = 0; i < prod.length; i++){
+            List<OrderProducts> tem = em.createQuery("select o from OrderProducts o where o.id.orderId = " + order.getId() + " and o.id.productId = " + product.getId(), OrderProducts.class)
+                    .getResultList();
+            if (tem.size() != 0){
+                final OrderProducts orderProducts = tem.get(0);
+                orderProducts.setCount(count);
+                em.merge(orderProducts);
+            }else{
+                final OrderProducts orderProducts = new OrderProducts(order, product, count);
+                order.addProduct(orderProducts);
+                product.addOrder(orderProducts);
+                em.persist(orderProducts);
+            }
+        }
+        List<OrderProducts> newList = em.createQuery("select o from OrderProducts o where o.id.orderId = " + order.getId(), OrderProducts.class).getResultList();
+
+        for(int i =0; i < newList.size(); i++){
+            boolean flag = false;
+            for (int j = 0; j < prod.length; j++){
+
+                if (Objects.equals(newList.get(i).getId().getProductId(), prod[j])) {
+                    flag = true;
+                    break;
+                }
+            }
+            if (!flag){
+                newList.get(i).getProduct().removeOrder(newList.get(i));
+                newList.get(i).getOrder().removeProducts(newList.get(i));
+                em.remove(newList.get(i));
+            }
         }
     }
 }
