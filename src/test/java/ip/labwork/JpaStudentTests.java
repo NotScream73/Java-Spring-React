@@ -28,7 +28,7 @@ public class JpaStudentTests {
     @Autowired
     OrderService orderService;
     @Test
-    void testCreate() {
+    void test() {
         componentService.deleteAllComponent();
         productService.deleteAllProduct();
         orderService.deleteAllOrder();
@@ -49,7 +49,7 @@ public class JpaStudentTests {
         log.info(order.toString());
         Assertions.assertNotNull(order.getId());
 
-        /*//TestRead
+        //TestRead
         final Component findComponent = componentService.findComponent(component.getId());
         log.info(findComponent.toString());
         Assertions.assertEquals(component, findComponent);
@@ -96,6 +96,6 @@ public class JpaStudentTests {
 
         final List<Order> newOrders = orderService.findAllOrder();
         log.info(newOrders.toString());
-        Assertions.assertEquals(newOrders.size(), 0);*/
+        Assertions.assertEquals(newOrders.size(), 0);
     }
 }
