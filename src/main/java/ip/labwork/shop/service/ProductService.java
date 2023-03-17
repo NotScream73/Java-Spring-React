@@ -1,6 +1,7 @@
 package ip.labwork.shop.service;
 
 import ip.labwork.shop.model.Component;
+import ip.labwork.shop.model.OrderProducts;
 import ip.labwork.shop.model.Product;
 import ip.labwork.shop.model.ProductComponents;
 import jakarta.persistence.EntityManager;
@@ -96,6 +97,13 @@ public class ProductService {
             temp.getProduct().removeComponent(temp);
             em.remove(temp);
         }
+        int ordSize = currentProduct.getOrders().size();
+        for (int i = 0; i < ordSize; i++){
+            OrderProducts temp = currentProduct.getOrders().get(0);
+            temp.getProduct().removeOrder(temp);
+            temp.getOrder().removeProducts(temp);
+            em.remove(temp);
+        }
         em.remove(currentProduct);
         return currentProduct;
     }
@@ -103,6 +111,7 @@ public class ProductService {
     @Transactional
     public void deleteAllProduct() {
         em.createQuery("delete from ProductComponents").executeUpdate();
+        em.createQuery("delete from OrderProducts ").executeUpdate();
         em.createQuery("delete from Product").executeUpdate();
     }
 

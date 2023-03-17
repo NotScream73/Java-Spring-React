@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "order_product")
 public class OrderProducts {
     @EmbeddedId
     private OrderProductsKey id;
@@ -16,6 +17,7 @@ public class OrderProducts {
     @JoinColumn(name = "order_id")
     @JsonIgnore
     private Order order;
+    @Column(name = "count")
     private Integer count;
 
     public OrderProducts() {

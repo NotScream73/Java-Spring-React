@@ -1,6 +1,9 @@
 package ip.labwork.shop.service;
 
 import ip.labwork.shop.model.Component;
+import ip.labwork.shop.model.OrderProducts;
+import ip.labwork.shop.model.Product;
+import ip.labwork.shop.model.ProductComponents;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
@@ -67,11 +70,19 @@ public class ComponentService {
     @Transactional
     public Component deleteComponent(Long id) {
         final Component currentComponent = findComponent(id);
+        int size = currentComponent.getProducts().size();
+        for (int i = 0; i < size; i++) {
+            ProductComponents temp = currentComponent.getProducts().get(0);
+            temp.getComponent().removeProduct(temp);
+            temp.getProduct().removeComponent(temp);
+            em.remove(temp);
+        }
         em.remove(currentComponent);
         return currentComponent;
     }
     @Transactional
     public void deleteAllComponent() {
+        em.createQuery("delete from ProductComponents").executeUpdate();
         em.createQuery("delete from Component").executeUpdate();
     }
 }

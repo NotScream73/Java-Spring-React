@@ -8,15 +8,17 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
+@Table(name = "components")
 public class Component {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @Column()
+    @Column(name = "name")
     private String componentName;
+    @Column(name = "price")
     private Integer price;
 
-    @OneToMany(mappedBy = "component", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "component", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonIgnore
     private List<ProductComponents> products;
 
