@@ -1,4 +1,4 @@
-package ip.labwork.student.model;
+package ip.labwork.shop.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -19,6 +19,7 @@ public class Component {
     @OneToMany(mappedBy = "component", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<ProductComponents> products;
+
     public Component() {
     }
 
@@ -54,17 +55,20 @@ public class Component {
     public void setProducts(List<ProductComponents> products) {
         this.products = products;
     }
-    public void addProduct(ProductComponents productComponents){
-        if (products == null){
+
+    public void addProduct(ProductComponents productComponents) {
+        if (products == null) {
             products = new ArrayList<>();
         }
         if (!products.contains(productComponents))
             this.products.add(productComponents);
     }
-    public void removeProduct(ProductComponents productComponents){
+
+    public void removeProduct(ProductComponents productComponents) {
         if (products.contains(productComponents))
             this.products.remove(productComponents);
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

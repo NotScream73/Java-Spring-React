@@ -1,4 +1,4 @@
-package ip.labwork.student.model;
+package ip.labwork.shop.model;
 
 import jakarta.persistence.*;
 
@@ -21,11 +21,9 @@ public class Order {
 
     }
 
-    public Order(Long id, Date date, Integer price, List<OrderProducts> products) {
-        this.id = id;
+    public Order(Date date, Integer price) {
         this.date = date;
         this.price = price;
-        this.products = products;
     }
 
     public Long getId() {

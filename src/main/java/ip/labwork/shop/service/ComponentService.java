@@ -1,6 +1,6 @@
-package ip.labwork.student.service;
+package ip.labwork.shop.service;
 
-import ip.labwork.student.model.Component;
+import ip.labwork.shop.model.Component;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -16,11 +17,11 @@ public class ComponentService {
     private EntityManager em;
 
     @Transactional
-    public Component addComponent(String ComponentName, Integer Count) {
-        if (!StringUtils.hasText(ComponentName) || Count == 0) {
+    public Component addComponent(String componentName, Integer price) {
+        if (!StringUtils.hasText(componentName) || price == 0) {
             throw new IllegalArgumentException("Component is null or empty");
         }
-        final Component component = new Component(ComponentName, Count);
+        final Component component = new Component(componentName, price);
         em.persist(component);
         return component;
     }
@@ -40,14 +41,26 @@ public class ComponentService {
                 .getResultList();
     }
 
+    @Transactional(readOnly = true)
+    public List<Component> findFiltredComponents(Long[] arr) {
+        if (arr.length == 0) {
+            throw new IllegalArgumentException("Array id is empty");
+        }
+        List<Component> componentList = new ArrayList<>();
+        for (int i = 0; i < arr.length; i++) {
+            componentList.add(em.find(Component.class, arr[i]));
+        }
+        return componentList;
+    }
+
     @Transactional
-    public Component updateComponent(Long id, String ComponentName, Integer Count) {
-        if (!StringUtils.hasText(ComponentName) || Count == 0) {
+    public Component updateComponent(Long id, String componentName, Integer price) {
+        if (!StringUtils.hasText(componentName) || price == 0) {
             throw new IllegalArgumentException("Component is null or empty");
         }
         final Component currentComponent = findComponent(id);
-        currentComponent.setComponentName(ComponentName);
-        currentComponent.setPrice(Count);
+        currentComponent.setComponentName(componentName);
+        currentComponent.setPrice(price);
         return em.merge(currentComponent);
     }
 
@@ -56,10 +69,6 @@ public class ComponentService {
         final Component currentComponent = findComponent(id);
         em.remove(currentComponent);
         return currentComponent;
-    }
-    @Transactional
-    public void check(){
-        int s = 5;
     }
     @Transactional
     public void deleteAllComponent() {

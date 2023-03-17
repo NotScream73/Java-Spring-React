@@ -1,4 +1,4 @@
-package ip.labwork.student.model;
+package ip.labwork.shop.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -17,6 +17,7 @@ public class ProductComponents {
     @JsonIgnore
     private Product product;
     private Integer count;
+
     public ProductComponents() {
     }
 

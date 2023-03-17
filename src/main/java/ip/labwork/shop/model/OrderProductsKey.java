@@ -1,4 +1,4 @@
-package ip.labwork.student.model;
+package ip.labwork.shop.model;
 
 import jakarta.persistence.Embeddable;
 

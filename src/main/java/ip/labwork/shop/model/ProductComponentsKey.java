@@ -1,4 +1,4 @@
-package ip.labwork.student.model;
+package ip.labwork.shop.model;
 
 import jakarta.persistence.Embeddable;
 
@@ -9,6 +9,7 @@ import java.util.Objects;
 public class ProductComponentsKey implements Serializable {
     private Long productId;
     private Long componentId;
+
     public ProductComponentsKey() {
     }
 

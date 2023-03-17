@@ -1,13 +1,11 @@
-package ip.labwork.student.model;
+package ip.labwork.shop.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 public class Product {
@@ -25,13 +23,13 @@ public class Product {
     private List<OrderProducts> orders;
 
 
-    public Product(){
+    public Product() {
 
     }
-    public Product(String productName, Integer price, List<ProductComponents> components) {
+
+    public Product(String productName, Integer price) {
         this.productName = productName;
         this.price = price;
-        this.components = components;
     }
 
     public Long getId() {
