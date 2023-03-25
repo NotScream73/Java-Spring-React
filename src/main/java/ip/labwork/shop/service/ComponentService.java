@@ -1,70 +1,61 @@
 package ip.labwork.shop.service;
 
 import ip.labwork.shop.model.Component;
-import ip.labwork.shop.model.OrderProducts;
-import ip.labwork.shop.model.Product;
 import ip.labwork.shop.model.ProductComponents;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.PersistenceContext;
+import ip.labwork.shop.repository.ComponentRepository;
+import ip.labwork.shop.repository.ProductComponentRepository;
+import ip.labwork.util.validation.ValidatorUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ComponentService {
-    @PersistenceContext
-    private EntityManager em;
+
+    private final ComponentRepository componentRepository;
+    private final ProductComponentRepository productComponentRepository;
+    private final ValidatorUtil validatorUtil;
+
+    public ComponentService(ComponentRepository componentRepository,
+                          ValidatorUtil validatorUtil, ProductComponentRepository productComponentRepository) {
+        this.componentRepository = componentRepository;
+        this.validatorUtil = validatorUtil;
+        this.productComponentRepository = productComponentRepository;
+    }
 
     @Transactional
     public Component addComponent(String componentName, Integer price) {
-        if (!StringUtils.hasText(componentName) || price == 0) {
-            throw new IllegalArgumentException("Component is null or empty");
-        }
         final Component component = new Component(componentName, price);
-        em.persist(component);
-        return component;
+        validatorUtil.validate(component);
+        return componentRepository.save(component);
     }
 
     @Transactional(readOnly = true)
     public Component findComponent(Long id) {
-        final Component component = em.find(Component.class, id);
-        if (component == null) {
-            throw new EntityNotFoundException(String.format("Component with id [%s] is not found", id));
-        }
-        return component;
+        final Optional<Component> student = componentRepository.findById(id);
+        return student.orElseThrow(() -> new ComponentNotFoundException(id));
     }
 
     @Transactional(readOnly = true)
     public List<Component> findAllComponent() {
-        return em.createQuery("select c from Component c", Component.class)
-                .getResultList();
+        return componentRepository.findAll();
     }
 
     @Transactional(readOnly = true)
     public List<Component> findFiltredComponents(Long[] arr) {
-        if (arr.length == 0) {
-            throw new IllegalArgumentException("Array id is empty");
-        }
-        List<Component> componentList = new ArrayList<>();
-        for (int i = 0; i < arr.length; i++) {
-            componentList.add(em.find(Component.class, arr[i]));
-        }
-        return componentList;
+        return componentRepository.findAllById(Arrays.stream(arr).toList());
     }
 
     @Transactional
     public Component updateComponent(Long id, String componentName, Integer price) {
-        if (!StringUtils.hasText(componentName) || price == 0) {
-            throw new IllegalArgumentException("Component is null or empty");
-        }
         final Component currentComponent = findComponent(id);
         currentComponent.setComponentName(componentName);
         currentComponent.setPrice(price);
-        return em.merge(currentComponent);
+        validatorUtil.validate(currentComponent);
+        return componentRepository.save(currentComponent);
     }
 
     @Transactional
@@ -75,14 +66,14 @@ public class ComponentService {
             ProductComponents temp = currentComponent.getProducts().get(0);
             temp.getComponent().removeProduct(temp);
             temp.getProduct().removeComponent(temp);
-            em.remove(temp);
+            productComponentRepository.delete(temp);
         }
-        em.remove(currentComponent);
+        componentRepository.delete(currentComponent);
         return currentComponent;
     }
     @Transactional
     public void deleteAllComponent() {
-        em.createQuery("delete from ProductComponents").executeUpdate();
-        em.createQuery("delete from Component").executeUpdate();
+        productComponentRepository.deleteAll();
+        componentRepository.deleteAll();
     }
 }

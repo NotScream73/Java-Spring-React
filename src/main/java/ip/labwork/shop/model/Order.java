@@ -1,6 +1,7 @@
 package ip.labwork.shop.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,8 +14,10 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    @NotBlank(message = "Date can't be null or empty")
     @Column(name = "date")
     private Date date;
+    @NotBlank(message = "Price can't be null or empty")
     @Column(name = "price")
     private Integer price;
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)

@@ -12,11 +12,19 @@ repositories {
 	mavenCentral()
 }
 
+jar {
+	enabled = false
+}
+
 dependencies {
+	implementation(project(':Front'))
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'com.h2database:h2:2.1.210'
 	implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.5'
+	implementation 'org.hibernate.validator:hibernate-validator'
+
+	implementation 'org.springdoc:springdoc-openapi-ui:1.6.5'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 }

@@ -3,10 +3,7 @@ package ip.labwork.shop.controller;
 import ip.labwork.shop.service.ProductService;
 import ip.labwork.shop.model.Product;
 import ip.labwork.shop.service.ComponentService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,35 +18,37 @@ public class ProductController {
         this.componentService = componentService;
     }
 
-    @GetMapping("/add")
-    public Product create(@RequestParam("name") String name,
+    @PostMapping
+    public ProductDTO createProduct(@RequestParam("name") String name,
                           @RequestParam("price") Integer price,
                           @RequestParam("count") Integer[] count,
                           @RequestParam("comp") Long[] comp){
-        return productService.addProduct(name, price, count, componentService.findFiltredComponents(comp));
+        return new ProductDTO(productService.addProduct(name, price, count, componentService.findFiltredComponents(comp)));
     }
-    @GetMapping("/update")
-    public Product update(@RequestParam("id") Long id,
+    @PutMapping("/{id}")
+    public ProductDTO updateProduct(@PathVariable Long id,
                           @RequestParam("name") String name,
                           @RequestParam("price") Integer price,
                           @RequestParam("count") Integer[] count,
                           @RequestParam("comp") Long[] comp){
-        return productService.updateProduct(id, name, price, count, componentService.findFiltredComponents(comp));
+        return new ProductDTO(productService.updateProduct(id, name, price, count, componentService.findFiltredComponents(comp)));
     }
-    @GetMapping("/remove")
-    public Product remove(@RequestParam("id") Long id){
-        return productService.deleteProduct(id);
+    @DeleteMapping("/{id}")
+    public ProductDTO removeProduct(@PathVariable Long id){
+        return new ProductDTO(productService.deleteProduct(id));
     }
-    @GetMapping("/removeAll")
-    public void remove(){
+    @DeleteMapping
+    public void removeAllProduct(){
         productService.deleteAllProduct();
     }
-    @GetMapping("/find")
-    public Product find(@RequestParam("id") Long id){
-        return productService.findProduct(id);
+    @GetMapping("/{id}")
+    public ProductDTO findProduct(@PathVariable Long id){
+        return new ProductDTO(productService.findProduct(id));
     }
-    @GetMapping("/findAll")
-    public List<Product> findAll(){
-        return productService.findAllProduct();
+    @GetMapping
+    public List<ProductDTO> findAllProduct(){
+        return productService.findAllProduct().stream()
+                .map(ProductDTO::new)
+                .toList();
     }
 }

@@ -1,11 +1,7 @@
 package ip.labwork.shop.controller;
 
-import ip.labwork.shop.model.Component;
 import ip.labwork.shop.service.ComponentService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,36 +15,38 @@ public class ComponentController {
         this.componentService = componentService;
     }
 
-    @GetMapping("/add")
-    public Component create(@RequestParam("name") String name,
+    @PostMapping
+    public ComponentDTO createComponent(@RequestParam("name") String name,
                             @RequestParam("price") Integer price) {
-        return componentService.addComponent(name, price);
+        return new ComponentDTO(componentService.addComponent(name, price));
     }
 
-    @GetMapping("/update")
-    public Component update(@RequestParam("id") Long id,
+    @PutMapping("/{id}")
+    public ComponentDTO updateComponent(@PathVariable Long id,
                             @RequestParam("name") String name,
                             @RequestParam("price") Integer price) {
-        return componentService.updateComponent(id, name, price);
+        return new ComponentDTO(componentService.updateComponent(id, name, price));
     }
 
-    @GetMapping("/remove")
-    public Component remove(@RequestParam("id") Long id) {
-        return componentService.deleteComponent(id);
+    @DeleteMapping("/{id}")
+    public ComponentDTO removeComponent(@PathVariable Long id) {
+        return new ComponentDTO(componentService.deleteComponent(id));
     }
 
-    @GetMapping("/removeAll")
-    public void remove() {
+    @DeleteMapping
+    public void removeAllComponent() {
         componentService.deleteAllComponent();
     }
 
-    @GetMapping("/find")
-    public Component find(@RequestParam("id") Long id) {
-        return componentService.findComponent(id);
+    @GetMapping("/{id}")
+    public ComponentDTO findComponent(@PathVariable Long id) {
+        return new ComponentDTO(componentService.findComponent(id));
     }
 
-    @GetMapping("/findAll")
-    public List<Component> findAll() {
-        return componentService.findAllComponent();
+    @GetMapping
+    public List<ComponentDTO> findAllComponent() {
+        return componentService.findAllComponent().stream()
+                .map(ComponentDTO::new)
+                .toList();
     }
 }

@@ -3,10 +3,7 @@ package ip.labwork.shop.controller;
 import ip.labwork.shop.service.ProductService;
 import ip.labwork.shop.model.Order;
 import ip.labwork.shop.service.OrderService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,35 +17,37 @@ public class OrderController {
         this.productService = productService;
     }
 
-    @GetMapping("/add")
-    public Order create(@RequestParam("date") String date,
+    @PostMapping
+    public OrderDTO createOrder(@RequestParam("date") String date,
                         @RequestParam("price") Integer price,
                         @RequestParam("count") Integer[] count,
                         @RequestParam("prod") Long[] prod){
-        return orderService.addOrder(date, price, count, productService.findFiltredProducts(prod));
+        return new OrderDTO(orderService.addOrder(date, price, count, productService.findFiltredProducts(prod)));
     }
-    @GetMapping("/update")
-    public Order update(@RequestParam("id") Long id,
+    @PutMapping("/{id}")
+    public OrderDTO updateOrder(@PathVariable Long id,
                         @RequestParam("date") String date,
                         @RequestParam("price") Integer price,
                         @RequestParam("count") Integer[] count,
                         @RequestParam("prod") Long[] prod){
-        return orderService.updateOrder(id, date, price, count, productService.findFiltredProducts(prod));
+        return new OrderDTO(orderService.updateOrder(id, date, price, count, productService.findFiltredProducts(prod)));
     }
-    @GetMapping("/remove")
-    public Order remove(@RequestParam("id") Long id){
-        return orderService.deleteOrder(id);
+    @DeleteMapping("/{id}")
+    public OrderDTO removeOrder(@PathVariable Long id){
+        return new OrderDTO(orderService.deleteOrder(id));
     }
-    @GetMapping("/removeAll")
-    public void remove(){
+    @DeleteMapping
+    public void removeAllOrder(){
         orderService.deleteAllOrder();
     }
-    @GetMapping("/find")
-    public Order find(@RequestParam("id") Long id){
-        return orderService.findOrder(id);
+    @GetMapping("/{id}")
+    public OrderDTO findOrder(@PathVariable Long id){
+        return new OrderDTO(orderService.findOrder(id));
     }
-    @GetMapping("/findAll")
-    public List<Order> findAll(){
-        return orderService.findAllOrder();
+    @GetMapping
+    public List<OrderDTO> findAllOrder(){
+        return orderService.findAllOrder().stream()
+                .map(OrderDTO::new)
+                .toList();
     }
 }

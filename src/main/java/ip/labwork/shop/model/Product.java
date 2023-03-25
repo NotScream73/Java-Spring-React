@@ -2,6 +2,7 @@ package ip.labwork.shop.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,8 +14,10 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    @NotBlank(message = "ProductName can't be null or empty")
     @Column(name = "name")
     private String productName;
+    @NotBlank(message = "Price can't be null or empty")
     @Column(name = "price")
     private Integer price;
 

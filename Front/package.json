@@ -1,16 +1,17 @@
 {
   "name": "int-prog",
   "version": "1.0.0",
-  "main": "index.html",
+  "main": "src/index.html",
   "scripts": {
-    "start": "http-server -p 3000 ./",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "parcel --port 3000",
+    "build": "npm run clean && parcel build",
+    "clean": "rimraf dist"
   },
   "dependencies": {
-    "bootstrap": "5.2.1",
-    "@fortawesome/fontawesome-free": "6.2.0"
+    "bootstrap": "5.2.1"
   },
   "devDependencies": {
-    "http-server": "14.1.1"
+    "parcel": "2.8.3",
+    "rimraf": "4.4.0"
   }
 }

@@ -1,36 +1,38 @@
 package ip.labwork.shop.service;
 
-import ip.labwork.shop.model.Order;
-import ip.labwork.shop.model.OrderProducts;
-import ip.labwork.shop.model.Product;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.PersistenceContext;
+import ip.labwork.shop.model.*;
+import ip.labwork.shop.repository.OrderProductRepository;
+import ip.labwork.shop.repository.OrderRepository;
+import ip.labwork.util.validation.ValidatorUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
 public class OrderService {
-    @PersistenceContext
-    private EntityManager em;
+    private final OrderRepository orderRepository;
+    private final OrderProductRepository orderProductRepository;
+    private final ValidatorUtil validatorUtil;
 
+    public OrderService(OrderRepository orderRepository,
+                            ValidatorUtil validatorUtil, OrderProductRepository orderProductRepository) {
+        this.orderRepository = orderRepository;
+        this.validatorUtil = validatorUtil;
+        this.orderProductRepository = orderProductRepository;
+    }
     @Transactional
     public Order addOrder(String date, Integer price, Integer[] count, List<Product> products) {
-        if (!StringUtils.hasText(date) || price == 0 || count.length == 0 || Arrays.stream(count).filter(c -> c == 0).toList().size() != 0 || products.size() == 0 || products.stream().filter(Objects::isNull).toList().size() != 0 || count.length != products.size()) {
-            throw new IllegalArgumentException("Order is null or empty");
-        }
         Date correctDate = getDate(date);
         final Order order = new Order(correctDate, price);
-        em.persist(order);
+        validatorUtil.validate(order);
+        orderRepository.save(order);
         for (int i = 0; i < products.size(); i++) {
             final OrderProducts orderProducts = new OrderProducts(order, products.get(i), count[i]);
             order.addProduct(orderProducts);
             products.get(i).addOrder(orderProducts);
-            em.persist(orderProducts);
+            orderProductRepository.save(orderProducts);
         }
         return order;
     }
@@ -49,30 +51,23 @@ public class OrderService {
 
     @Transactional(readOnly = true)
     public Order findOrder(Long id) {
-        final Order order = em.find(Order.class, id);
-        if (order == null) {
-            throw new EntityNotFoundException(String.format("Order with id [%s] is not found", id));
-        }
-        return order;
+        final Optional<Order> order = orderRepository.findById(id);
+        return order.orElseThrow(() -> new OrderNotFoundException(id));
     }
 
     @Transactional(readOnly = true)
     public List<Order> findAllOrder() {
-        return em.createQuery("select o from Order o", Order.class)
-                .getResultList();
+        return orderRepository.findAll();
     }
 
     @Transactional
     public Order updateOrder(Long id, String date, Integer price, Integer[] count, List<Product> products) {
-        if (!StringUtils.hasText(date) || price == 0 || count.length == 0 || Arrays.stream(count).filter(c -> c == 0).toList().size() != 0 || products.size() == 0 || products.stream().filter(Objects::isNull).toList().size() != 0 || count.length != products.size()) {
-            throw new IllegalArgumentException("Order is null or empty");
-        }
         final Order currentOrder = findOrder(id);
         currentOrder.setDate(getDate(date));
         currentOrder.setPrice(price);
-        em.merge(currentOrder);
-        List<OrderProducts> orderProductsList = em.createQuery("select o from OrderProducts o where o.id.orderId = " + id, OrderProducts.class)
-                .getResultList();
+        validatorUtil.validate(currentOrder);
+        orderRepository.save(currentOrder);
+        List<OrderProducts> orderProductsList = orderProductRepository.getOrderProductsByOrderId(id);
         List<Long> product_id = new ArrayList<>(orderProductsList.stream().map(p -> p.getId().getProductId()).toList());
         for (int i = 0; i < products.size(); i++) {
             final Long currentId = products.get(i).getId();
@@ -81,18 +76,18 @@ public class OrderService {
                 orderProductsList.remove(orderProducts);
                 product_id.remove(products.get(i).getId());
                 orderProducts.setCount(count[i]);
-                em.merge(orderProducts);
+                orderProductRepository.save(orderProducts);
             } else {
                 final OrderProducts orderProducts = new OrderProducts(currentOrder, products.get(i), count[i]);
                 currentOrder.addProduct(orderProducts);
                 products.get(i).addOrder(orderProducts);
-                em.persist(orderProducts);
+                orderProductRepository.save(orderProducts);
             }
         }
         for (int i = 0; i < orderProductsList.size(); i++) {
             orderProductsList.get(i).getProduct().removeOrder(orderProductsList.get(i));
             orderProductsList.get(i).getOrder().removeProducts(orderProductsList.get(i));
-            em.remove(orderProductsList.get(i));
+            orderProductRepository.delete(orderProductsList.get(i));
         }
         return currentOrder;
     }
@@ -105,14 +100,14 @@ public class OrderService {
             OrderProducts temp = currentOrder.getProducts().get(0);
             temp.getProduct().removeOrder(temp);
             temp.getOrder().removeProducts(temp);
-            em.remove(temp);
+            orderProductRepository.delete(temp);
         }
-        em.remove(currentOrder);
+        orderRepository.delete(currentOrder);
         return currentOrder;
     }
     @Transactional
     public void deleteAllOrder() {
-        em.createQuery("delete from OrderProducts").executeUpdate();
-        em.createQuery("delete from Order").executeUpdate();
+        orderProductRepository.deleteAll();
+        orderRepository.deleteAll();
     }
 }

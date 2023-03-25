@@ -1,0 +1,58 @@
+import com.github.gradle.node.util.PlatformHelper
+import groovy.text.SimpleTemplateEngine
+
+plugins {
+    id 'java'
+    id 'com.github.node-gradle.node' version '3.5.1'
+    id "de.undercouch.download" version '5.3.1'
+}
+
+node {
+    version = '18.15.0'
+    download = true
+}
+
+jar.dependsOn 'npmBuild'
+
+clean.dependsOn 'npmClean'
+
+nodeSetup.dependsOn 'downloadNode'
+
+jar {
+    from 'dist'
+    into 'static'
+    final devHost = 'http://localhost:8080'
+    final prodHost = ''
+    filesMatching('index.html') {
+        filter { line -> line.replaceAll(devHost, prodHost) }
+    }
+}
+
+task downloadNode(type: Download) {
+    final helper = new PlatformHelper()
+    final templateData = [
+            "url"    : node.distBaseUrl.get(),
+            "version": node.version.get(),
+            "os"     : helper.osName,
+            "arch"   : helper.osArch,
+            "ext"    : helper.windows ? 'zip' : 'tar.gz'
+    ]
+    final urlTemplate = '${url}/v${version}/node-v${version}-${os}-${arch}.${ext}'
+    final engine = new SimpleTemplateEngine()
+    final url = engine.createTemplate(urlTemplate).make(templateData).toString()
+    final String destDir = '.gradle/'
+    file(destDir).mkdirs()
+    src url
+    dest destDir
+    overwrite false
+}
+
+tasks.register('npmBuild', NpmTask) {
+    dependsOn npmInstall
+    args = ['run-script', 'build']
+}
+
+tasks.register('npmClean', NpmTask) {
+    dependsOn npmInstall
+    args = ['run-script', 'clean']
+}

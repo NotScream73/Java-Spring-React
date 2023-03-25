@@ -2,6 +2,7 @@ package ip.labwork.shop.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "product_component")
@@ -17,6 +18,7 @@ public class ProductComponents {
     @JoinColumn(name = "product_id")
     @JsonIgnore
     private Product product;
+    @NotBlank(message = "Count can't be null or empty")
     @Column(name = "count")
     private Integer count;
 
