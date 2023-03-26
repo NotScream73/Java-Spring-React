@@ -27,26 +27,38 @@
             </ul>
         </div>
     </nav>
-    <form id="form">
+    <form id="form" novalidate>
         <div class="row mt-3">
-            <div class="col-sm-6">
-                <label for="lastName" class="form-label">Last name</label>
-                <input type="text" class="form-control" id="lastName" required>
+            <div class="col-sm-4">
+                <label for="productId" class="form-label">ИД продукта</label>
+                <input type="text" class="form-control" id="productId" required>
             </div>
-            <div class="col-sm-6">
-                <label for="firstName" class="form-label">First name</label>
-                <input type="text" class="form-control" id="firstName" required>
+            <div class="col-sm-4">
+                <label for="productName" class="form-label">Название продукта</label>
+                <input type="text" class="form-control" id="productName" required>
+            </div>
+            <div class="col-sm-4">
+                <label for="productPrice" class="form-label">Цена</label>
+                <input type="text" class="form-control" id="productPrice" required>
+            </div>
+            <div class="col-sm-4">
+                <label for="componentId" class="form-label">ИД компонента</label>
+                <input type="text" class="form-control" id="componentId" required>
+            </div>
+            <div class="col-sm-4">
+                <label for="componentCount" class="form-label">Количество компонента</label>
+                <input type="text" class="form-control" id="componentCount" required>
             </div>
         </div>
         <div class="row mt-3">
             <div class="d-grid col-sm-4 mx-auto">
-                <button type="submit" class="btn btn-success">Add</button>
+                <button type="submit" class="btn btn-success">Добавить</button>
             </div>
-            <div class="d-grid col-sm-4 mx-auto mt-3 mt-sm-0">
-                <button id="testError" type="button" class="btn btn-danger">Test</button>
+            <div class="d-grid col-sm-4 mx-auto">
+                <button type="submit" class="btn btn-success" id="btnUpdate" >Обновить</button>
             </div>
-            <div class="d-grid col-sm-4 mx-auto mt-3 mt-sm-0">
-                <button id="testNormal" type="button" class="btn btn-secondary">Test</button>
+            <div class="d-grid col-sm-4 mx-auto">
+                <button id="btnRemove" class="btn btn-success">Удалить</button>
             </div>
         </div>
     </form>
@@ -54,9 +66,10 @@
         <table id="table" class="table mt-3">
             <thead>
             <tr>
-                <th scope="col">#</th>
-                <th scope="col">First name</th>
-                <th scope="col">Last name</th>
+                <th scope="col">ИД</th>
+                <th scope="col">Название продукта</th>
+                <th scope="col">Цена</th>
+                <th scope="col">Компоненты</th>
             </tr>
             </thead>
             <tbody id="tbody">

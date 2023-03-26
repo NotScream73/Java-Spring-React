@@ -45,7 +45,6 @@ public class JpaStudentTests {
 
         List<Product> productList = new ArrayList<>();
         productList.add(productService.findProduct(product.getId()));
-
         final Order order = orderService.addOrder(new Date().toString(), 200);
         orderService.addOrderProducts(orderService.findOrder(order.getId()), new Integer[]{ 2 }, productList);
         log.info(order.toString());

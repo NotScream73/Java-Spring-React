@@ -25,7 +25,7 @@ public class ProductController {
                           @RequestParam("comp") Long[] comp){
         final Product product = productService.addProduct(name, price);
         productService.addProductComponents(productService.findProduct(product.getId()), count, componentService.findFiltredComponents(comp));
-        return new ProductDTO(product);
+        return new ProductDTO(productService.findProduct(product.getId()));
     }
     @PutMapping("/{id}")
     public ProductDTO updateProduct(@PathVariable Long id,
@@ -38,7 +38,9 @@ public class ProductController {
     }
     @DeleteMapping("/{id}")
     public ProductDTO removeProduct(@PathVariable Long id){
-        return new ProductDTO(productService.deleteProduct(id));
+        ProductDTO temp = new ProductDTO(productService.deleteProduct(id));
+        productService.test();
+        return null;
     }
     @DeleteMapping
     public void removeAllProduct(){

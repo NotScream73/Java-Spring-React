@@ -27,26 +27,30 @@
             </ul>
         </div>
     </nav>
-    <form id="form">
+    <form id="form" novalidate>
         <div class="row mt-3">
-            <div class="col-sm-6">
+            <div class="col-sm-4">
+                <label for="componentId" class="form-label">ИД компонента</label>
+                <input type="text" class="form-control" id="componentId" required>
+            </div>
+            <div class="col-sm-4">
                 <label for="componentName" class="form-label">Название компонента</label>
                 <input type="text" class="form-control" id="componentName" required>
             </div>
-            <div class="col-sm-6">
+            <div class="col-sm-4">
                 <label for="price" class="form-label">Цена</label>
                 <input type="text" class="form-control" id="price" required>
             </div>
         </div>
         <div class="row mt-3">
             <div class="d-grid col-sm-4 mx-auto">
-                <button type="submit" class="btn btn-success">Add</button>
+                <button type="submit" class="btn btn-success">Добавить</button>
             </div>
             <div class="d-grid col-sm-4 mx-auto">
-                <button type="submit" class="btn btn-success">Update</button>
+                <button type="submit" class="btn btn-success" id="btnUpdate" >Обновить</button>
             </div>
             <div class="d-grid col-sm-4 mx-auto">
-                <button type="submit" class="btn btn-success">Delete</button>
+                <button id="btnRemove" class="btn btn-success">Удалить</button>
             </div>
         </div>
     </form>
@@ -54,9 +58,9 @@
         <table id="table" class="table mt-3">
             <thead>
             <tr>
-                <th scope="col">#</th>
-                <th scope="col">First name</th>
-                <th scope="col">Last name</th>
+                <th scope="col">ИД</th>
+                <th scope="col">Название компонента</th>
+                <th scope="col">Цена</th>
             </tr>
             </thead>
             <tbody id="tbody">

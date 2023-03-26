@@ -4,14 +4,12 @@ import ip.labwork.shop.model.Component;
 import ip.labwork.shop.model.OrderProducts;
 import ip.labwork.shop.model.Product;
 import ip.labwork.shop.model.ProductComponents;
-import ip.labwork.shop.repository.ComponentRepository;
-import ip.labwork.shop.repository.OrderProductRepository;
-import ip.labwork.shop.repository.ProductComponentRepository;
-import ip.labwork.shop.repository.ProductRepository;
+import ip.labwork.shop.repository.*;
 import ip.labwork.util.validation.ValidatorUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
+import org.h2.mvstore.tx.Transaction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -45,6 +43,7 @@ public class ProductService {
     public void addProductComponents(Product product, Integer[] count, List<Component> components){
         for (int i = 0; i < components.size(); i++) {
             final ProductComponents productComponents = new ProductComponents(components.get(i), product, count[i]);
+            productComponentRepository.saveAndFlush(productComponents);
             product.addComponent(productComponents);
             components.get(i).addProduct(productComponents);
             productComponentRepository.saveAndFlush(productComponents);

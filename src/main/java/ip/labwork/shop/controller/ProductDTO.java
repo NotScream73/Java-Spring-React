@@ -1,9 +1,12 @@
 package ip.labwork.shop.controller;
 
 import ip.labwork.shop.model.Product;
+import ip.labwork.shop.model.ProductComponents;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class ProductDTO {
     private final long id;
@@ -15,8 +18,11 @@ public class ProductDTO {
         this.id = product.getId();
         this.productName = product.getProductName();
         this.price = product.getPrice();
-        this.componentDTOList = product.getComponents().stream().filter(x -> Objects.equals(x.getId().getProductId(), product.getId())).map(x -> new ComponentDTO(x.getComponent())).toList();
-        this.orderDTOList = product.getOrders().stream().filter(x -> Objects.equals(x.getId().getProductId(), product.getId())).map(x -> new OrderDTO(x.getOrder())).toList();
+        this.componentDTOList = product.getComponents().stream()
+                                .filter(x -> Objects.equals(x.getId().getProductId(), product.getId()))
+                                .map(y -> new ComponentDTO(y.getComponent(), y.getCount()))
+                                .toList();
+        this.orderDTOList = product.getOrders() == null ? null : product.getOrders().stream().filter(x -> Objects.equals(x.getId().getProductId(), product.getId())).map(x -> new OrderDTO(x.getOrder())).toList();
     }
 
     public long getId() {

@@ -6,7 +6,9 @@ window.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById("form");
     const componentNameInput = document.getElementById("componentName");
     const priceInput = document.getElementById("price");
-    const isEdit = false;
+    const componentIdInput = document.getElementById("componentId");
+    const buttonRemove = document.getElementById("btnRemove");
+    const buttonUpdate = document.getElementById("btnUpdate");
     const getData = async function () {
         table.innerHTML = "";
         const response = await fetch(host + "/component");
@@ -15,9 +17,8 @@ window.addEventListener('DOMContentLoaded', function () {
             table.innerHTML +=
                 `<tr>
                         <th scope="row" id="componentId">${Component.id}</th>
-                        <td>${Component.price}</td>
                         <td>${Component.componentName}</td>
-                        <td><button onsubmit="edit">edit</button></td>
+                        <td>${Component.price}</td>
                     </tr>`;
         })
     }
@@ -33,40 +34,61 @@ window.addEventListener('DOMContentLoaded', function () {
         return await response.json();
     }
 
-    const test = async function (testObject) {
+    const remove = async function (){
+        console.info('Try to remove item');
+        if (itemId.value !== 0) {
+            if (!confirm('Do you really want to remove this item?')) {
+                console.info('Canceled');
+                return;
+            }
+        }
         const requestParams = {
-            method: "POST",
+            method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
-            },
-            body: JSON.stringify(testObject),
+            }
         };
-        const response = await fetch(host + "/test", requestParams);
-        if (response.status === 200) {
-            const data = await response.json();
-            alert(`TestDto=[id=${data.id}, name=${data.name}, data=${data.data}]`);
-        }
-        if (response.status === 400) {
-            const data = await response.text();
-            alert(data);
-        }
+        const response = await fetch(host + `/component/` + itemId.value, requestParams);
+        return await response.json();
     }
-    function edit(){
-        alert('хуй');
+
+    const update = async function (){
+        console.info('Try to update item');
+        if (componentIdInput.value === 0 || componentNameInput.value == null || priceInput.value === 0) {
+            return;
+        }
+        const requestParams = {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            }
+        };
+        const response = await fetch(host + `/component/${componentIdInput.value}?price=${priceInput.value}&name=${componentNameInput.value}`, requestParams);
+        return await response.json();
     }
-    form.addEventListener("submit", function (event) {
+
+    buttonRemove.addEventListener('click', function (event){
         event.preventDefault();
-        create(priceInput.value, componentNameInput.value).then((result) => {
-            getData();
+        remove().then((result) => {
+            getData()
+            componentIdInput.value = "";
             priceInput.value = "";
             componentNameInput.value = "";
-            alert(`Component[id=${result.id}, price=${result.price}, componentName=${result.componentName}]`);
         });
     });
 
-    table.addEventListener("edit", function (event) {
+    buttonUpdate.addEventListener('click', function (event){
         event.preventDefault();
-        alert('хуй');
+        update().then((result) => {
+            getData()
+            componentIdInput.value = "";
+            priceInput.value = "";
+            componentNameInput.value = "";
+        });
+    });
+
+    form.addEventListener("submit", function (event) {
+        event.preventDefault();
         create(priceInput.value, componentNameInput.value).then((result) => {
             getData();
             priceInput.value = "";

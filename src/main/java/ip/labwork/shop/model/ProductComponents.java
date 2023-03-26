@@ -9,12 +9,12 @@ import jakarta.validation.constraints.NotNull;
 @Table(name = "product_component")
 public class ProductComponents {
     @EmbeddedId
-    private ProductComponentsKey id;
-    @ManyToOne(cascade = CascadeType.ALL)
+    private ProductComponentsKey id = new ProductComponentsKey();
+    @ManyToOne(cascade = CascadeType.MERGE)
     @MapsId("componentId")
     @JoinColumn(name = "component_id")
     private Component component;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.MERGE)
     @MapsId("productId")
     @JoinColumn(name = "product_id")
     @JsonIgnore
@@ -28,7 +28,6 @@ public class ProductComponents {
 
     public ProductComponents(Component component, Product product, Integer count) {
         this.component = component;
-        this.id = new ProductComponentsKey(product.getId(), component.getId());
         this.id.setComponentId(component.getId());
         this.id.setProductId(product.getId());
         this.product = product;
