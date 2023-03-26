@@ -1,2 +1,2 @@
 rootProject.name = 'labwork'
-include 'Front'
+include 'front'

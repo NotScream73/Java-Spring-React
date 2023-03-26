@@ -23,20 +23,22 @@ public class OrderService {
         this.orderProductRepository = orderProductRepository;
     }
     @Transactional
-    public Order addOrder(String date, Integer price, Integer[] count, List<Product> products) {
+    public Order addOrder(String date, Integer price) {
         Date correctDate = getDate(date);
         final Order order = new Order(correctDate, price);
         validatorUtil.validate(order);
         orderRepository.save(order);
+        return order;
+    }
+    @Transactional
+    public void addOrderProducts(Order order, Integer[] count, List<Product> products){
         for (int i = 0; i < products.size(); i++) {
             final OrderProducts orderProducts = new OrderProducts(order, products.get(i), count[i]);
             order.addProduct(orderProducts);
             products.get(i).addOrder(orderProducts);
             orderProductRepository.save(orderProducts);
         }
-        return order;
     }
-
     public Date getDate(String date) {
         SimpleDateFormat format = new SimpleDateFormat();
         format.applyPattern("dd.MM.yyyy");
@@ -60,7 +62,7 @@ public class OrderService {
         return orderRepository.findAll();
     }
 
-    @Transactional
+    /*@Transactional
     public Order updateOrder(Long id, String date, Integer price, Integer[] count, List<Product> products) {
         final Order currentOrder = findOrder(id);
         currentOrder.setDate(getDate(date));
@@ -90,8 +92,54 @@ public class OrderService {
             orderProductRepository.delete(orderProductsList.get(i));
         }
         return currentOrder;
-    }
+    }*/
 
+    @Transactional
+    public Order updateOrder(Long id, String date, Integer price, Integer[] count, List<Product> products) {
+        final Order currentOrder = findOrder(id);
+        currentOrder.setDate(getDate(date));
+        currentOrder.setPrice(price);
+        validatorUtil.validate(currentOrder);
+        orderRepository.save(currentOrder);
+        List<OrderProducts> orderProductsList = orderProductRepository.getOrderProductsByOrderId(id);
+        List<Long> product_id = new ArrayList<>(orderProductsList.stream().map(p -> p.getId().getProductId()).toList());
+        for (int i = 0; i < products.size(); i++) {
+            final Long currentId = products.get(i).getId();
+            if (product_id.contains(currentId)) {
+                final OrderProducts orderProducts = orderProductsList.stream().filter(x -> Objects.equals(x.getId().getProductId(), currentId)).toList().get(0);
+                orderProductsList.remove(orderProducts);
+                product_id.remove(products.get(i).getId());
+                orderProducts.setCount(count[i]);
+                orderProductRepository.save(orderProducts);
+            }
+        }
+        for (int i = 0; i < orderProductsList.size(); i++) {
+            orderProductsList.get(i).getProduct().removeOrder(orderProductsList.get(i));
+            orderProductsList.get(i).getOrder().removeProducts(orderProductsList.get(i));
+            orderProductRepository.delete(orderProductsList.get(i));
+        }
+        return currentOrder;
+    }
+    @Transactional
+    public Order update(Order currentOrder, List<OrderProducts> orderProductsList, List<Long> product_id, Integer[] count, List<Product> products) {
+        for (int i = 0; i < products.size(); i++) {
+            final Long currentId = products.get(i).getId();
+            if (product_id.contains(currentId)) {
+                orderProductsList.remove(orderProductsList.stream().filter(x -> Objects.equals(x.getId().getProductId(), currentId)).toList().get(0));
+                product_id.remove(products.get(i).getId());
+            }
+            else {
+                final OrderProducts orderProducts = new OrderProducts(currentOrder, products.get(i), count[i]);
+                currentOrder.addProduct(orderProducts);
+                products.get(i).addOrder(orderProducts);
+                orderProductRepository.save(orderProducts);
+            }
+        }
+        return currentOrder;
+    }
+    public List<OrderProducts> getOrderProducts(Order currentOrder){
+        return orderProductRepository.getOrderProductsByOrderId(currentOrder.getId());
+    }
     @Transactional
     public Order deleteOrder(Long id) {
         final Order currentOrder = findOrder(id);
@@ -107,6 +155,7 @@ public class OrderService {
     }
     @Transactional
     public void deleteAllOrder() {
+        orderProductRepository.findAll().forEach(OrderProducts::remove);
         orderProductRepository.deleteAll();
         orderRepository.deleteAll();
     }

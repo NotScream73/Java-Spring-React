@@ -3,9 +3,7 @@ package ip.labwork;
 import ip.labwork.shop.model.Component;
 import ip.labwork.shop.model.Order;
 import ip.labwork.shop.model.Product;
-import ip.labwork.shop.service.ComponentService;
-import ip.labwork.shop.service.OrderService;
-import ip.labwork.shop.service.ProductService;
+import ip.labwork.shop.service.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -39,13 +37,17 @@ public class JpaStudentTests {
 
         List<Component> componentList = new ArrayList<>();
         componentList.add(componentService.findComponent(component.getId()));
-        final Product product = productService.addProduct("Бургер", 100, new Integer[]{ 2 }, componentList);
+
+        final Product product = productService.addProduct("Бургер", 100);
+        productService.addProductComponents(productService.findProduct(product.getId()), new Integer[]{ 2}, componentList );
         log.info(product.toString());
         Assertions.assertNotNull(product.getId());
 
         List<Product> productList = new ArrayList<>();
         productList.add(productService.findProduct(product.getId()));
-        final Order order = orderService.addOrder(new Date().toString(), 200, new Integer[]{ 3 }, productList);
+
+        final Order order = orderService.addOrder(new Date().toString(), 200);
+        orderService.addOrderProducts(orderService.findOrder(order.getId()), new Integer[]{ 2 }, productList);
         log.info(order.toString());
         Assertions.assertNotNull(order.getId());
 
@@ -75,19 +77,18 @@ public class JpaStudentTests {
         log.info(orders.toString());
         Assertions.assertEquals(orders.size(), 1);
 
-
         //TestReadNotFound
         componentService.deleteAllComponent();
         productService.deleteAllProduct();
         orderService.deleteAllOrder();
-
-        Assertions.assertThrows(EntityNotFoundException.class, () -> componentService.findComponent(-1L));
-        Assertions.assertThrows(EntityNotFoundException.class, () -> productService.findProduct(-1L));
-        Assertions.assertThrows(EntityNotFoundException.class, () -> orderService.findOrder(-1L));
+        Assertions.assertThrows(ComponentNotFoundException.class, () -> componentService.findComponent(-1L));
+        Assertions.assertThrows(ProductNotFoundException.class, () -> productService.findProduct(-1L));
+        Assertions.assertThrows(OrderNotFoundException.class, () -> orderService.findOrder(-1L));
 
         //TestReadAllEmpty
         final List<Component> newComponents = componentService.findAllComponent();
         log.info(newComponents.toString());
+        productService.test();
         Assertions.assertEquals(newComponents.size(), 0);
 
         final List<Product> newProducts = productService.findAllProduct();

@@ -1,14 +1,14 @@
 {
-  "name": "int-prog",
+  "name": "front",
   "version": "1.0.0",
-  "main": "src/index.html",
+  "source": "src/index.html",
   "scripts": {
     "start": "parcel --port 3000",
     "build": "npm run clean && parcel build",
     "clean": "rimraf dist"
   },
   "dependencies": {
-    "bootstrap": "5.2.1"
+    "bootstrap": "5.2.3"
   },
   "devDependencies": {
     "parcel": "2.8.3",

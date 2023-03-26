@@ -23,29 +23,33 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductComponentRepository productComponentRepository;
     private final OrderProductRepository orderProductRepository;
+    private final ComponentRepository componentRepository;
     private final ValidatorUtil validatorUtil;
 
     public ProductService(ProductRepository productRepository,
-                            ValidatorUtil validatorUtil, ProductComponentRepository productComponentRepository, OrderProductRepository orderProductRepository) {
+                            ValidatorUtil validatorUtil, ProductComponentRepository productComponentRepository, OrderProductRepository orderProductRepository, ComponentRepository componentRepository) {
         this.productRepository = productRepository;
         this.validatorUtil = validatorUtil;
         this.productComponentRepository = productComponentRepository;
         this.orderProductRepository = orderProductRepository;
+        this.componentRepository = componentRepository;
     }
     @Transactional
-    public Product addProduct(String productName, Integer price, Integer[] count, List<Component> components) {
+    public Product addProduct(String productName, Integer price) {
         final Product product = new Product(productName, price);
         validatorUtil.validate(product);
         productRepository.save(product);
+        return product;
+    }
+    @Transactional
+    public void addProductComponents(Product product, Integer[] count, List<Component> components){
         for (int i = 0; i < components.size(); i++) {
             final ProductComponents productComponents = new ProductComponents(components.get(i), product, count[i]);
             product.addComponent(productComponents);
             components.get(i).addProduct(productComponents);
-            productComponentRepository.save(productComponents);
+            productComponentRepository.saveAndFlush(productComponents);
         }
-        return product;
     }
-
     @Transactional(readOnly = true)
     public Product findProduct(Long id) {
         final Optional<Product> product = productRepository.findById(id);
@@ -57,6 +61,38 @@ public class ProductService {
         return productRepository.findAll();
     }
 
+    /*@Transactional
+    public Product updateProduct(Long id, String productName, Integer price, Integer[] count, List<Component> components) {
+        final Product currentProduct = findProduct(id);
+        currentProduct.setProductName(productName);
+        currentProduct.setPrice(price);
+        validatorUtil.validate(currentProduct);
+        productRepository.save(currentProduct);
+        List<ProductComponents> productComponentsList = productComponentRepository.getProductComponentsByProductId(id);
+        List<Long> component_id = new ArrayList<>(productComponentsList.stream().map(p -> p.getId().getComponentId()).toList());
+        for (int i = 0; i < components.size(); i++) {
+            final Long currentId = components.get(i).getId();
+            if (component_id.contains(currentId)) {
+                final ProductComponents productComponents = productComponentsList.stream().filter(x -> Objects.equals(x.getId().getComponentId(), currentId)).toList().get(0);
+                productComponentsList.remove(productComponents);
+                component_id.remove(components.get(i).getId());
+                productComponents.setCount(count[i]);
+                productComponentRepository.saveAndFlush(productComponents);
+            }
+            else {
+                final ProductComponents productComponents = new ProductComponents(components.get(i), currentProduct, count[i]);
+                currentProduct.addComponent(productComponents);
+                components.get(i).addProduct(productComponents);
+                productComponentRepository.save(productComponents);
+            }
+        }
+        for (int i = 0; i < productComponentsList.size(); i++) {
+            productComponentsList.get(i).getComponent().removeProduct(productComponentsList.get(i));
+            productComponentsList.get(i).getProduct().removeComponent(productComponentsList.get(i));
+            productComponentRepository.delete(productComponentsList.get(i));
+        }
+        return currentProduct;
+    }*/
     @Transactional
     public Product updateProduct(Long id, String productName, Integer price, Integer[] count, List<Component> components) {
         final Product currentProduct = findProduct(id);
@@ -73,12 +109,7 @@ public class ProductService {
                 productComponentsList.remove(productComponents);
                 component_id.remove(components.get(i).getId());
                 productComponents.setCount(count[i]);
-                productComponentRepository.save(productComponents);
-            } else {
-                final ProductComponents productComponents = new ProductComponents(components.get(i), currentProduct, count[i]);
-                currentProduct.addComponent(productComponents);
-                components.get(i).addProduct(productComponents);
-                productComponentRepository.save(productComponents);
+                productComponentRepository.saveAndFlush(productComponents);
             }
         }
         for (int i = 0; i < productComponentsList.size(); i++) {
@@ -88,7 +119,29 @@ public class ProductService {
         }
         return currentProduct;
     }
-
+    @Transactional
+    public Product update(Product currentProduct, List<ProductComponents> productComponentsList, List<Long> component_id, Integer[] count, List<Component> components) {
+        for (int i = 0; i < components.size(); i++) {
+            final Long currentId = components.get(i).getId();
+            if (component_id.contains(currentId)) {
+                productComponentsList.remove(productComponentsList.stream().filter(x -> Objects.equals(x.getId().getComponentId(), currentId)).toList().get(0));
+                component_id.remove(components.get(i).getId());
+            }
+            else {
+                final ProductComponents productComponents = new ProductComponents(components.get(i), currentProduct, count[i]);
+                currentProduct.addComponent(productComponents);
+                components.get(i).addProduct(productComponents);
+                productComponentRepository.save(productComponents);
+            }
+        }
+        return currentProduct;
+    }
+    public List<ProductComponents> getProductComponents(Product currentProduct){
+        return productComponentRepository.getProductComponentsByProductId(currentProduct.getId());
+    }
+    public void test(){
+        int s =5;
+    }
     @Transactional
     public Product deleteProduct(Long id) {
         final Product currentProduct = findProduct(id);
@@ -112,6 +165,8 @@ public class ProductService {
 
     @Transactional
     public void deleteAllProduct() {
+        orderProductRepository.findAll().forEach(OrderProducts::remove);
+        productComponentRepository.findAll().forEach(ProductComponents::remove);
         productComponentRepository.deleteAll();
         orderProductRepository.deleteAll();
         productRepository.deleteAll();

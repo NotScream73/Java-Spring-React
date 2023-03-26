@@ -3,22 +3,23 @@ package ip.labwork.shop.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "product_component")
 public class ProductComponents {
     @EmbeddedId
     private ProductComponentsKey id;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @MapsId("componentId")
     @JoinColumn(name = "component_id")
     private Component component;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @MapsId("productId")
     @JoinColumn(name = "product_id")
     @JsonIgnore
     private Product product;
-    @NotBlank(message = "Count can't be null or empty")
+    @NotNull(message = "Count can't be null or empty")
     @Column(name = "count")
     private Integer count;
 
@@ -33,7 +34,6 @@ public class ProductComponents {
         this.product = product;
         this.count = count;
     }
-
     public ProductComponentsKey getId() {
         return id;
     }
@@ -64,5 +64,21 @@ public class ProductComponents {
 
     public void setCount(Integer count) {
         this.count = count;
+    }
+    public void remove() {
+        product.getComponents().remove(this);
+        product = null;
+        component.getProducts().remove(this);
+        component = null;
+    }
+
+    @Override
+    public String toString() {
+        return "ProductComponents{" +
+                "id=" + id +
+                ", component=" + component +
+                ", product=" + product +
+                ", count=" + count +
+                '}';
     }
 }

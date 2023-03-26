@@ -8,6 +8,7 @@ import ip.labwork.util.validation.ValidatorUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -73,7 +74,12 @@ public class ComponentService {
     }
     @Transactional
     public void deleteAllComponent() {
+        productComponentRepository.findAll().forEach(ProductComponents::remove);
         productComponentRepository.deleteAll();
         componentRepository.deleteAll();
+    }
+
+    public void test() {
+        int s =5;
     }
 }

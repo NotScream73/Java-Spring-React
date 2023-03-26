@@ -3,6 +3,7 @@ package ip.labwork.shop.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,7 @@ public class Component {
     @NotBlank(message = "ComponentName can't be null or empty")
     @Column(name = "name")
     private String componentName;
-    @NotBlank(message = "Price can't be null or empty")
+    @NotNull(message= "Price may not be empty")
     @Column(name = "price")
     private Integer price;
 
