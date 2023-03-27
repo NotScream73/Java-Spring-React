@@ -9,12 +9,12 @@ import jakarta.validation.constraints.NotNull;
 @Table(name = "order_product")
 public class OrderProducts {
     @EmbeddedId
-    private OrderProductsKey id;
-    @ManyToOne
+    private OrderProductsKey id = new OrderProductsKey();
+    @ManyToOne(cascade = CascadeType.MERGE)
     @MapsId("productId")
     @JoinColumn(name = "product_id")
     private Product product;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE)
     @MapsId("orderId")
     @JoinColumn(name = "order_id")
     @JsonIgnore
@@ -28,7 +28,6 @@ public class OrderProducts {
 
     public OrderProducts(Order order, Product product, Integer count) {
         this.order = order;
-        this.id = new OrderProductsKey(product.getId(), order.getId());
         this.id.setOrderId(order.getId());
         this.id.setProductId(product.getId());
         this.product = product;

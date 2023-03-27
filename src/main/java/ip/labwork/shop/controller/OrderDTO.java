@@ -15,7 +15,10 @@ public class OrderDTO {
         this.id = order.getId();
         this.date = order.getDate();
         this.price = order.getPrice();
-        this.productDTOList = order.getProducts().stream().filter(x -> Objects.equals(x.getId().getOrderId(), order.getId())).map(x -> new ProductDTO(x.getProduct())).toList();
+        this.productDTOList = order.getProducts().stream()
+                .filter(x -> Objects.equals(x.getId().getOrderId(), order.getId()))
+                .map(y -> new ProductDTO(y.getProduct(), y.getCount()))
+                .toList();
     }
 
     public long getId() {

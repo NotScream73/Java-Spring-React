@@ -18,13 +18,13 @@ public class OrderController {
     }
 
     @PostMapping
-    public OrderDTO createOrder(@RequestParam("date") String date,
+    public Order createOrder(@RequestParam("date") String date,
                         @RequestParam("price") Integer price,
                         @RequestParam("count") Integer[] count,
                         @RequestParam("prod") Long[] prod){
         final Order order = orderService.addOrder(date, price);
         orderService.addOrderProducts(orderService.findOrder(order.getId()), count, productService.findFiltredProducts(prod));
-        return new OrderDTO(order);
+        return order;
     }
     @PutMapping("/{id}")
     public OrderDTO updateOrder(@PathVariable Long id,
@@ -32,8 +32,7 @@ public class OrderController {
                         @RequestParam("price") Integer price,
                         @RequestParam("count") Integer[] count,
                         @RequestParam("prod") Long[] prod){
-        orderService.updateOrder(id, date, price, count, productService.findFiltredProducts(prod));
-        return new OrderDTO(orderService.update(orderService.findOrder(id),orderService.getOrderProducts(orderService.findOrder(id)), orderService.getOrderProducts(orderService.findOrder(id)).stream().map(p -> p.getId().getProductId()).toList(), count, productService.findFiltredProducts(prod)));
+        return new OrderDTO(orderService.updateOrder(id, date, price, count, productService.findFiltredProducts(prod)));
     }
     @DeleteMapping("/{id}")
     public OrderDTO removeOrder(@PathVariable Long id){

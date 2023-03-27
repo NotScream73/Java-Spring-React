@@ -34,6 +34,7 @@ public class OrderService {
     public void addOrderProducts(Order order, Integer[] count, List<Product> products){
         for (int i = 0; i < products.size(); i++) {
             final OrderProducts orderProducts = new OrderProducts(order, products.get(i), count[i]);
+            orderProductRepository.saveAndFlush(orderProducts);
             order.addProduct(orderProducts);
             products.get(i).addOrder(orderProducts);
             orderProductRepository.save(orderProducts);
@@ -62,7 +63,7 @@ public class OrderService {
         return orderRepository.findAll();
     }
 
-    /*@Transactional
+    @Transactional
     public Order updateOrder(Long id, String date, Integer price, Integer[] count, List<Product> products) {
         final Order currentOrder = findOrder(id);
         currentOrder.setDate(getDate(date));
@@ -81,6 +82,7 @@ public class OrderService {
                 orderProductRepository.save(orderProducts);
             } else {
                 final OrderProducts orderProducts = new OrderProducts(currentOrder, products.get(i), count[i]);
+                orderProductRepository.saveAndFlush(orderProducts);
                 currentOrder.addProduct(orderProducts);
                 products.get(i).addOrder(orderProducts);
                 orderProductRepository.save(orderProducts);
@@ -92,9 +94,9 @@ public class OrderService {
             orderProductRepository.delete(orderProductsList.get(i));
         }
         return currentOrder;
-    }*/
+    }
 
-    @Transactional
+    /*@Transactional
     public Order updateOrder(Long id, String date, Integer price, Integer[] count, List<Product> products) {
         final Order currentOrder = findOrder(id);
         currentOrder.setDate(getDate(date));
@@ -136,7 +138,7 @@ public class OrderService {
             }
         }
         return currentOrder;
-    }
+    }*/
     public List<OrderProducts> getOrderProducts(Order currentOrder){
         return orderProductRepository.getOrderProductsByOrderId(currentOrder.getId());
     }

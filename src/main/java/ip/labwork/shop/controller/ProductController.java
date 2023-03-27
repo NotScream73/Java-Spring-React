@@ -23,9 +23,7 @@ public class ProductController {
                           @RequestParam("price") Integer price,
                           @RequestParam("count") Integer[] count,
                           @RequestParam("comp") Long[] comp){
-        final Product product = productService.addProduct(name, price);
-        productService.addProductComponents(productService.findProduct(product.getId()), count, componentService.findFiltredComponents(comp));
-        return new ProductDTO(productService.findProduct(product.getId()));
+        return new ProductDTO(productService.addProduct(name, price, count, componentService.findFiltredComponents(comp)));
     }
     @PutMapping("/{id}")
     public ProductDTO updateProduct(@PathVariable Long id,
@@ -33,8 +31,7 @@ public class ProductController {
                           @RequestParam("price") Integer price,
                           @RequestParam("count") Integer[] count,
                           @RequestParam("comp") Long[] comp){
-        productService.updateProduct(id, name, price, count, componentService.findFiltredComponents(comp));
-        return new ProductDTO(productService.update(productService.findProduct(id),productService.getProductComponents(productService.findProduct(id)), productService.getProductComponents(productService.findProduct(id)).stream().map(p -> p.getId().getComponentId()).toList(), count, componentService.findFiltredComponents(comp)));
+        return new ProductDTO(productService.updateProduct(id, name, price, count, componentService.findFiltredComponents(comp)));
     }
     @DeleteMapping("/{id}")
     public ProductDTO removeProduct(@PathVariable Long id){

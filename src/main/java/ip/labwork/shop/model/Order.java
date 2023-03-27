@@ -15,7 +15,7 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @NotNull(message = "Date can't be null or empty")
+    //@NotNull(message = "Date can't be null or empty")
     @Column(name = "date")
     private Date date;
     @NotNull(message = "Price can't be null or empty")

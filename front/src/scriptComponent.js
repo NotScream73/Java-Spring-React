@@ -36,7 +36,7 @@ window.addEventListener('DOMContentLoaded', function () {
 
     const remove = async function (){
         console.info('Try to remove item');
-        if (itemId.value !== 0) {
+        if (componentIdInput.value !== 0) {
             if (!confirm('Do you really want to remove this item?')) {
                 console.info('Canceled');
                 return;
@@ -48,7 +48,7 @@ window.addEventListener('DOMContentLoaded', function () {
                 "Content-Type": "application/json",
             }
         };
-        const response = await fetch(host + `/component/` + itemId.value, requestParams);
+        const response = await fetch(host + `/component/` + componentIdInput.value, requestParams);
         return await response.json();
     }
 

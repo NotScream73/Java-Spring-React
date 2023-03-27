@@ -33,14 +33,10 @@ public class ProductService {
         this.componentRepository = componentRepository;
     }
     @Transactional
-    public Product addProduct(String productName, Integer price) {
+    public Product addProduct(String productName, Integer price, Integer[] count, List<Component> components) {
         final Product product = new Product(productName, price);
         validatorUtil.validate(product);
         productRepository.save(product);
-        return product;
-    }
-    @Transactional
-    public void addProductComponents(Product product, Integer[] count, List<Component> components){
         for (int i = 0; i < components.size(); i++) {
             final ProductComponents productComponents = new ProductComponents(components.get(i), product, count[i]);
             productComponentRepository.saveAndFlush(productComponents);
@@ -48,6 +44,7 @@ public class ProductService {
             components.get(i).addProduct(productComponents);
             productComponentRepository.saveAndFlush(productComponents);
         }
+        return product;
     }
     @Transactional(readOnly = true)
     public Product findProduct(Long id) {
@@ -60,7 +57,7 @@ public class ProductService {
         return productRepository.findAll();
     }
 
-    /*@Transactional
+    @Transactional
     public Product updateProduct(Long id, String productName, Integer price, Integer[] count, List<Component> components) {
         final Product currentProduct = findProduct(id);
         currentProduct.setProductName(productName);
@@ -80,6 +77,7 @@ public class ProductService {
             }
             else {
                 final ProductComponents productComponents = new ProductComponents(components.get(i), currentProduct, count[i]);
+                productComponentRepository.saveAndFlush(productComponents);
                 currentProduct.addComponent(productComponents);
                 components.get(i).addProduct(productComponents);
                 productComponentRepository.save(productComponents);
@@ -91,8 +89,8 @@ public class ProductService {
             productComponentRepository.delete(productComponentsList.get(i));
         }
         return currentProduct;
-    }*/
-    @Transactional
+    }
+   /* @Transactional
     public Product updateProduct(Long id, String productName, Integer price, Integer[] count, List<Component> components) {
         final Product currentProduct = findProduct(id);
         currentProduct.setProductName(productName);
@@ -124,7 +122,7 @@ public class ProductService {
             final Long currentId = components.get(i).getId();
             if (component_id.contains(currentId)) {
                 productComponentsList.remove(productComponentsList.stream().filter(x -> Objects.equals(x.getId().getComponentId(), currentId)).toList().get(0));
-                component_id.remove(components.get(i).getId());
+                component_id.remove(currentId);
             }
             else {
                 final ProductComponents productComponents = new ProductComponents(components.get(i), currentProduct, count[i]);
@@ -134,7 +132,7 @@ public class ProductService {
             }
         }
         return currentProduct;
-    }
+    }*/
     public List<ProductComponents> getProductComponents(Product currentProduct){
         return productComponentRepository.getProductComponentsByProductId(currentProduct.getId());
     }
