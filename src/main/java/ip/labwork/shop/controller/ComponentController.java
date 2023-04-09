@@ -1,6 +1,7 @@
 package ip.labwork.shop.controller;
 
 import ip.labwork.shop.service.ComponentService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,21 +17,18 @@ public class ComponentController {
     }
 
     @PostMapping
-    public ComponentDTO createComponent(@RequestParam("name") String name,
-                            @RequestParam("price") Integer price) {
-        return new ComponentDTO(componentService.addComponent(name, price));
+    public ComponentDTO createComponent(@RequestBody @Valid ComponentDTO componentDTO) {
+        return componentService.create(componentDTO);
     }
 
     @PutMapping("/{id}")
-    public ComponentDTO updateComponent(@PathVariable Long id,
-                            @RequestParam("name") String name,
-                            @RequestParam("price") Integer price) {
-        return new ComponentDTO(componentService.updateComponent(id, name, price));
+    public ComponentDTO updateComponent(@PathVariable Long id,@RequestBody @Valid ComponentDTO componentDTO) {
+        return componentService.updateComponent(id,componentDTO);
     }
 
     @DeleteMapping("/{id}")
     public ComponentDTO removeComponent(@PathVariable Long id) {
-        return new ComponentDTO(componentService.deleteComponent(id));
+        return componentService.deleteComponent(id);
     }
 
     @DeleteMapping
@@ -45,8 +43,6 @@ public class ComponentController {
 
     @GetMapping
     public List<ComponentDTO> findAllComponent() {
-        return componentService.findAllComponent().stream()
-                .map(ComponentDTO::new)
-                .toList();
+        return componentService.findAllComponent();
     }
 }

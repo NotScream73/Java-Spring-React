@@ -2,19 +2,18 @@ package ip.labwork.shop.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "order_product")
 public class OrderProducts {
     @EmbeddedId
-    private OrderProductsKey id;
-    @ManyToOne
+    private OrderProductsKey id = new OrderProductsKey();
+    @ManyToOne(cascade = CascadeType.MERGE)
     @MapsId("productId")
     @JoinColumn(name = "product_id")
     private Product product;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE)
     @MapsId("orderId")
     @JoinColumn(name = "order_id")
     @JsonIgnore

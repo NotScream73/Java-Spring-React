@@ -7,15 +7,21 @@ import java.util.List;
 import java.util.Objects;
 
 public class OrderDTO {
-    private final long id;
-    private final Date date;
-    private final int price;
-    private final List<ProductDTO> productDTOList;
+    private long id;
+    private Date date = new Date();
+    private int price;
+    private List<ProductDTO> productDTOList;
     public OrderDTO(Order order) {
         this.id = order.getId();
         this.date = order.getDate();
         this.price = order.getPrice();
-        this.productDTOList = order.getProducts().stream().filter(x -> Objects.equals(x.getId().getOrderId(), order.getId())).map(x -> new ProductDTO(x.getProduct())).toList();
+        this.productDTOList = order.getProducts().stream()
+                .filter(x -> Objects.equals(x.getId().getOrderId(), order.getId()))
+                .map(y -> new ProductDTO(y.getProduct(), y.getCount()))
+                .toList();
+    }
+
+    public OrderDTO() {
     }
 
     public long getId() {
@@ -28,6 +34,14 @@ public class OrderDTO {
 
     public int getPrice() {
         return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     public List<ProductDTO> getProductDTOList() {

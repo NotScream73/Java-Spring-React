@@ -21,7 +21,9 @@ public class Product {
     @NotNull(message = "Price can't be null or empty")
     @Column(name = "price")
     private Integer price;
-
+    @Lob
+    @Column(name = "image")
+    private byte[] image;
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<ProductComponents> components;
 
@@ -34,9 +36,10 @@ public class Product {
 
     }
 
-    public Product(String productName, Integer price) {
+    public Product(String productName, Integer price, byte[] image) {
         this.productName = productName;
         this.price = price;
+        this.image = image;
     }
 
     public Long getId() {
@@ -61,6 +64,14 @@ public class Product {
 
     public List<ProductComponents> getComponents() {
         return components;
+    }
+
+    public byte[] getImage() {
+        return image;
+    }
+
+    public void setImage(byte[] image) {
+        this.image = image;
     }
 
     public void setComponents(List<ProductComponents> components) {

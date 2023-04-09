@@ -2,7 +2,6 @@ package ip.labwork.shop.repository;
 
 import ip.labwork.shop.model.OrderProducts;
 import ip.labwork.shop.model.OrderProductsKey;
-import ip.labwork.shop.model.ProductComponents;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
