@@ -23,7 +23,7 @@ jar {
     into 'static'
     final devHost = 'http://localhost:8080'
     final prodHost = ''
-    filesMatching('index.html') {
+    filesMatching('DataService.js') {
         filter { line -> line.replaceAll(devHost, prodHost) }
     }
 }
