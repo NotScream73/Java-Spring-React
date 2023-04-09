@@ -27,7 +27,6 @@ public class OrderProducts {
 
     public OrderProducts(Order order, Product product, Integer count) {
         this.order = order;
-        this.id = new OrderProductsKey(product.getId(), order.getId());
         this.id.setOrderId(order.getId());
         this.id.setProductId(product.getId());
         this.product = product;
