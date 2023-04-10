@@ -22,13 +22,15 @@ public class Order {
     private Integer price;
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<OrderProducts> products;
+    private OrderStatus status;
     public Order(){
 
     }
 
-    public Order(Date date, Integer price) {
+    public Order(Date date, Integer price, OrderStatus status) {
         this.date = date;
         this.price = price;
+        this.status = status;
     }
 
     public Long getId() {
@@ -72,6 +74,14 @@ public class Order {
     public void removeProducts(OrderProducts orderProducts){
         if (products.contains(orderProducts))
             this.products.remove(orderProducts);
+    }
+
+    public OrderStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(OrderStatus status) {
+        this.status = status;
     }
 
     @Override
