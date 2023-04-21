@@ -22,8 +22,11 @@ public class Component {
     @Column(name = "price")
     private Integer price;
 
-    @OneToMany(mappedBy = "component", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JsonIgnore
+    @OneToMany(mappedBy = "component", cascade =
+            {
+                    CascadeType.REMOVE,
+                    CascadeType.PERSIST
+            }, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ProductComponents> products;
 
     public Component() {

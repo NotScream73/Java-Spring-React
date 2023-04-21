@@ -4,7 +4,6 @@ import ip.labwork.shop.controller.ComponentDTO;
 import ip.labwork.shop.model.Component;
 import ip.labwork.shop.model.ProductComponents;
 import ip.labwork.shop.repository.ComponentRepository;
-import ip.labwork.shop.repository.ProductComponentRepository;
 import ip.labwork.util.validation.ValidatorUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,14 +15,12 @@ import java.util.Optional;
 public class ComponentService {
 
     private final ComponentRepository componentRepository;
-    private final ProductComponentRepository productComponentRepository;
     private final ValidatorUtil validatorUtil;
 
     public ComponentService(ComponentRepository componentRepository,
-                          ValidatorUtil validatorUtil, ProductComponentRepository productComponentRepository) {
+                          ValidatorUtil validatorUtil) {
         this.componentRepository = componentRepository;
         this.validatorUtil = validatorUtil;
-        this.productComponentRepository = productComponentRepository;
     }
 
     @Transactional
@@ -57,15 +54,12 @@ public class ComponentService {
             ProductComponents productComponents = currentComponent.getProducts().get(0);
             productComponents.getComponent().removeProduct(productComponents);
             productComponents.getProduct().removeComponent(productComponents);
-            productComponentRepository.delete(productComponents);
         }
         componentRepository.delete(currentComponent);
         return new ComponentDTO(currentComponent);
     }
     @Transactional
     public void deleteAllComponent() {
-        productComponentRepository.findAll().forEach(ProductComponents::remove);
-        productComponentRepository.deleteAll();
         componentRepository.deleteAll();
     }
 }

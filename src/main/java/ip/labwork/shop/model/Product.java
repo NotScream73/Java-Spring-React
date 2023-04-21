@@ -24,11 +24,19 @@ public class Product {
     @Lob
     @Column(name = "image")
     private byte[] image;
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "product", cascade =
+            {
+                    CascadeType.REMOVE,
+                    CascadeType.MERGE,
+                    CascadeType.PERSIST
+            }, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ProductComponents> components;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JsonIgnore
+    @OneToMany(mappedBy = "product", cascade =
+            {
+                    CascadeType.REMOVE,
+                    CascadeType.PERSIST
+            }, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<OrderProducts> orders;
 
 

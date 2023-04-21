@@ -15,17 +15,13 @@ import java.util.*;
 @Service
 public class ProductService {
     private final ProductRepository productRepository;
-    private final ProductComponentRepository productComponentRepository;
-    private final OrderProductRepository orderProductRepository;
     private final ComponentRepository componentRepository;
     private final ValidatorUtil validatorUtil;
 
     public ProductService(ProductRepository productRepository,
-                            ValidatorUtil validatorUtil, ProductComponentRepository productComponentRepository, OrderProductRepository orderProductRepository, ComponentRepository componentRepository) {
+                            ValidatorUtil validatorUtil, ComponentRepository componentRepository) {
         this.productRepository = productRepository;
         this.validatorUtil = validatorUtil;
-        this.productComponentRepository = productComponentRepository;
-        this.orderProductRepository = orderProductRepository;
         this.componentRepository = componentRepository;
     }
 
@@ -36,11 +32,9 @@ public class ProductService {
         productRepository.save(product);
         for (int i = 0; i < productDTO.getComponentDTOList().size(); i++) {
             final ProductComponents productComponents = new ProductComponents(componentRepository.findById(productDTO.getComponentDTOList().get(i).getId()).orElseThrow(() -> new ComponentNotFoundException(1L)), product, productDTO.getComponentDTOList().get(i).getCount());
-            productComponentRepository.saveAndFlush(productComponents);
             product.addComponent(productComponents);
-            componentRepository.findById(productDTO.getComponentDTOList().get(i).getId()).orElseThrow(() -> new ComponentNotFoundException(1L)).addProduct(productComponents);
-            productComponentRepository.saveAndFlush(productComponents);
         }
+        productRepository.save(product);
         return new ProductDTO(findProduct(product.getId()));
     }
     @Transactional(readOnly = true)
@@ -62,32 +56,32 @@ public class ProductService {
         currentProduct.setImage(product.getImage().getBytes());
         validatorUtil.validate(currentProduct);
         productRepository.save(currentProduct);
-        List<ProductComponents> productComponentsList = productComponentRepository.getProductComponentsByProductId(id);
+        List<ProductComponents> productComponentsList = productRepository.getProductComponent(id);
         List<Long> component_id = new ArrayList<>(productComponentsList.stream().map(p -> p.getId().getComponentId()).toList());
         List<Component> newComponents = componentRepository.findAllById(product.getComponentDTOList().stream().map(x -> x.getId()).toList());
         for (int i = 0; i < newComponents.size(); i++) {
             final Long currentId = newComponents.get(i).getId();
             if (component_id.contains(currentId)) {
-                final ProductComponents productComponents = productComponentsList.stream().filter(x -> Objects.equals(x.getId().getComponentId(), currentId)).toList().get(0);
+                final ProductComponents productComponents = productComponentsList.stream().filter(x -> x.getId().getComponentId().equals(currentId)).findFirst().get();
                 productComponentsList.remove(productComponents);
+                currentProduct.removeComponent(productComponents);
+                currentProduct.addComponent(new ProductComponents(newComponents.get(i) , currentProduct, product.getComponentDTOList().stream().filter(x -> x.getId() == currentId).toList().get(0).getCount()));
                 int finalI = i;
                 component_id = component_id.stream().filter(x -> !Objects.equals(x, newComponents.get(finalI).getId())).toList();
                 productComponents.setCount(product.getComponentDTOList().stream().filter(x -> x.getId() == currentId).toList().get(0).getCount());
-                productComponentRepository.saveAndFlush(productComponents);
+                productRepository.saveAndFlush(currentProduct);
             }
             else {
                 final ProductComponents productComponents = new ProductComponents(newComponents.get(i), currentProduct, product.getComponentDTOList().stream().filter(x -> x.getId() == currentId).toList().get(0).getCount());
-                productComponentRepository.saveAndFlush(productComponents);
                 currentProduct.addComponent(productComponents);
-                newComponents.get(i).addProduct(productComponents);
-                productComponentRepository.save(productComponents);
+                productRepository.saveAndFlush(currentProduct);
             }
         }
         for (int i = 0; i < productComponentsList.size(); i++) {
             productComponentsList.get(i).getComponent().removeProduct(productComponentsList.get(i));
             productComponentsList.get(i).getProduct().removeComponent(productComponentsList.get(i));
-            productComponentRepository.delete(productComponentsList.get(i));
         }
+        productRepository.saveAndFlush(currentProduct);
         return new ProductDTO(currentProduct);
     }
     @Transactional
@@ -98,14 +92,12 @@ public class ProductService {
             ProductComponents temp = currentProduct.getComponents().get(0);
             temp.getComponent().removeProduct(temp);
             temp.getProduct().removeComponent(temp);
-            productComponentRepository.delete(temp);
         }
         int ordSize = currentProduct.getOrders().size();
         for (int i = 0; i < ordSize; i++){
             OrderProducts orderProducts = currentProduct.getOrders().get(0);
             orderProducts.getProduct().removeOrder(orderProducts);
             orderProducts.getOrder().removeProducts(orderProducts);
-            orderProductRepository.delete(orderProducts);
         }
         productRepository.delete(currentProduct);
         return new ProductDTO(currentProduct);
@@ -113,10 +105,6 @@ public class ProductService {
 
     @Transactional
     public void deleteAllProduct() {
-        orderProductRepository.findAll().forEach(OrderProducts::remove);
-        productComponentRepository.findAll().forEach(ProductComponents::remove);
-        productComponentRepository.deleteAll();
-        orderProductRepository.deleteAll();
         productRepository.deleteAll();
     }
 
