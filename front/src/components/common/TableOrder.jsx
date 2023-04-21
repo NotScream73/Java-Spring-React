@@ -43,13 +43,8 @@ export default function TableOrder(props) {
       loadItems();
     }
   }
-  async function needWait(){
-    setOrder({...order, ["price"]:cost});
-  }
   async function acceptOrder(){
-    await needWait();
-    
-    await DataService.create("/order",order ).then(data => {
+    await DataService.create("/order",{...order, ["price"]:cost, ["status"]: "1"} ).then(data => {
       props.setProduct([]);
       setCost(0);
     });

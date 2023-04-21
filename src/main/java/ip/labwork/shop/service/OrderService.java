@@ -28,7 +28,7 @@ public class OrderService {
         for(int i = 0; i < orderDTO.getProductDTOList().size(); i++){
             price += orderDTO.getProductDTOList().get(i).getPrice() * orderDTO.getProductDTOList().get(i).getCount();
         }
-        final Order order = new Order(new Date(), price);
+        final Order order = new Order(new Date(), price, orderDTO.getStatus());
         validatorUtil.validate(order);
         orderRepository.save(order);
         for (int i = 0; i < orderDTO.getProductDTOList().size(); i++) {

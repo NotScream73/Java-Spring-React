@@ -5,6 +5,7 @@ import Footer from "./components/common/Footer";
 import CatalogStudents from './components/catalogs/CatalogStudents';
 import Menu from './components/catalogs/Menu';
 import Basket from './components/catalogs/Basket';
+import History from './components/catalogs/History';
 import { useState } from 'react';
 
 function Router(props) {
@@ -17,7 +18,8 @@ export default function App() {
     { index: true, element: <CatalogStudents /> },
     { path: "catalogs/menu", element: <Menu product={product} setProduct={setProduct}/>, label: "Меню" },
     { path: "catalogs/component", element: <CatalogStudents />, label: "Компоненты" },
-    { path: "catalogs/basket", element: <Basket product={product} setProduct={setProduct}/>, label: "Корзина" }
+    { path: "catalogs/basket", element: <Basket product={product} setProduct={setProduct}/>, label: "Корзина" },
+    { path: "catalogs/history", element: <History />, label: "История" }
   ];
   const links = routes.filter(route => route.hasOwnProperty('label'));
   const rootRoute = [
