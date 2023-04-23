@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{default}"
+>
+  <head> </head>
+  <body>
+    <main style="background-color: white" layout:fragment="content">
+      <div th:text="${errors}" class="margin-bottom alert-danger"></div>
+      <form
+        action="#"
+        th:action="@{/component/{id}(id=${id})}"
+        th:object="${componentDto}"
+        method="post"
+      >
+        <div class="mb-3">
+          <label for="componentName" class="form-label">Название</label>
+          <input
+            type="text"
+            class="form-control"
+            id="componentName"
+            th:field="${componentDto.componentName}"
+            required="true"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="price" class="form-label">Цена</label>
+          <input
+            type="text"
+            class="form-control"
+            id="price"
+            th:field="${componentDto.price}"
+            required="true"
+          />
+        </div>
+        <div class="mb-3">
+          <button type="submit" class="btn btn-primary button-fixed">
+            <span th:if="${id == null}">Добавить</span>
+            <span th:if="${id != null}">Обновить</span>
+          </button>
+          <a class="btn btn-secondary button-fixed" th:href="@{/component}">
+            Назад
+          </a>
+        </div>
+      </form>
+    </main>
+  </body>
+</html>

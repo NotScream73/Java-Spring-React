@@ -1,6 +1,8 @@
 package ip.labwork.shop.controller;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import ip.labwork.shop.model.Component;
+import jakarta.validation.constraints.NotBlank;
 
 public class ComponentDTO {
     private long id;
@@ -26,15 +28,31 @@ public class ComponentDTO {
         return id;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
     public String getComponentName() {
         return componentName;
+    }
+
+    public void setComponentName(String componentName) {
+        this.componentName = componentName;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
     }
 
     public int getCount() {
         return count;
     }
 
-    public int getPrice() {
-        return price;
+    public void setCount(int count) {
+        this.count = count;
     }
 }

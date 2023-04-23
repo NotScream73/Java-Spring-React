@@ -1,5 +1,6 @@
 package ip.labwork.shop.controller;
 
+import ip.labwork.WebConfiguration;
 import ip.labwork.shop.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -7,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/product")
+@RequestMapping(WebConfiguration.REST_API + "/product")
 public class ProductController {
     private final ProductService productService;
 

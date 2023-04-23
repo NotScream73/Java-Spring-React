@@ -1,11 +1,14 @@
 package ip.labwork.method.controller;
 
+import ip.labwork.WebConfiguration;
 import ip.labwork.method.service.MethodService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping(WebConfiguration.REST_API + "/method")
 public class MethodController {
     private final MethodService speakerService;
 

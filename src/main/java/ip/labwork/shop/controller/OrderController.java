@@ -1,5 +1,6 @@
 package ip.labwork.shop.controller;
 
+import ip.labwork.WebConfiguration;
 import ip.labwork.shop.service.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -7,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/order")
+@RequestMapping(WebConfiguration.REST_API + "/order")
 public class OrderController {
     private final OrderService orderService;
     public OrderController(OrderService orderService) {

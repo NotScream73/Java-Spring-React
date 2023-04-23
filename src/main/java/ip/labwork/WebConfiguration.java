@@ -12,7 +12,8 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.http.HttpStatus;
 
 @Configuration
-class WebConfiguration implements WebMvcConfigurer {
+public class WebConfiguration implements WebMvcConfigurer {
+    public static final String REST_API = "/api";
     @Override
     public void addCorsMappings(CorsRegistry registry){
         registry.addMapping("/**").allowedMethods("*");

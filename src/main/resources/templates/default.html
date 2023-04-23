@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html
+  lang="ru"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Очень вкусно и запятая</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script
+      type="text/javascript"
+      src="/webjars/bootstrap/5.1.3/js/bootstrap.bundle.min.js"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="/webjars/bootstrap/5.1.3/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="/webjars/font-awesome/6.1.0/css/all.min.css" />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body class="d-flex flex-column h-100">
+    <div id="app">
+      <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="/product">
+            <h1 class="text-black">Очень вкусно и запятая</h1>
+          </a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav"
+            aria-controls="navbarNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <a class="nav-link fs-4 text-black" href="/component"
+                >Компоненты</a
+              >
+              <a class="nav-link fs-4 text-black" href="/product">Продукты</a>
+              <a class="nav-link fs-4 text-black" href="/order">Заказы</a>
+            </ul>
+          </div>
+        </div>
+      </nav>
+      <div class="container-fluid p-0">
+        <div
+          class="container container-padding"
+          layout:fragment="content"
+        ></div>
+      </div>
+      <footer
+        class="footer mt-auto d-flex justify-content-center align-items-center"
+      >
+        ООО "Вкусно" © 2022
+      </footer>
+    </div>
+  </body>
+  <th:block layout:fragment="scripts"> </th:block>
+</html>

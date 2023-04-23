@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  layout:decorate="~{default}"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+>
+  <head> </head>
+  <body>
+    <main
+      class="flex-shrink-0"
+      style="background-color: white"
+      layout:fragment="content"
+    >
+      <h1 class="my-5 ms-5 fs-1">
+        <b>Корзина</b>
+      </h1>
+      <h2 class="my-5 ms-5 fs-3"></h2>
+      <div class="ms-5 my-5">Список товаров</div>
+      <div>
+        <div style="max-width: 35%">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Позиция</th>
+                <th scope="col"></th>
+                <th scope="col">Стоимость</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody class="table-group-divider">
+              <tr th:each="product, iterator: ${productDTOS}">
+                <th scope="row" th:text="${iterator.index+1}"></th>
+                <td colspan="2" th:text="${product.name}"></td>
+                <td th:text="${product.count+'x'+product.price+' руб'}"></td>
+                <td>
+                  <button th:attr="onclick=|remove(${product.id})|">
+                    Удалить
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h2 class="ms-5 my-5" th:text="${'Итого: ' + totalPrice + ' руб'}"></h2>
+        <button
+          class="btn btn-success ms-5 w-25"
+          type="button"
+          style="color: black"
+          th:attr="onclick=|document.getElementById('accept').click()|"
+        >
+          Купить
+        </button>
+        <form th:action="@{/order}" method="post">
+          <button th:id="'accept'" type="submit" style="display: none">
+            Купить
+          </button>
+        </form>
+      </div>
+      <p></p>
+      <p></p>
+    </main>
+  </body>
+  <th:block layout:fragment="scripts">
+    <script>
+      function deleteAll() {
+        let l = getCookie();
+        for (let i = 0; i < l.length; i++) {
+          if (l[i].id === "delete") {
+            let cookies = document.cookie.split(";");
+            for (let j = 0; j < cookies.length; j++) {
+              let cookie = cookies[j];
+              let eqPos = cookie.indexOf("=");
+              let name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+              document.cookie =
+                name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+              document.cookie =
+                name + "=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+            }
+            window.location.href = "/order";
+          }
+        }
+      }
+      deleteAll();
+      function remove(name) {
+        let i = getCookie(name);
+        const d = new Date();
+        d.setTime(d.getTime() + 24 * 60 * 60 * 1000);
+        let expires = "expires=" + d.toUTCString();
+        if (i == "1") {
+          document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+          document.cookie =
+            name + "=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+        } else {
+          document.cookie =
+            name + "=" + (Number(i) - Number(1)) + ";" + expires + ";path=/";
+        }
+        window.location.href = "/order";
+      }
+      function getCookie(name) {
+        if (name) {
+          name = name + "=";
+          let decodedCookie = decodeURIComponent(document.cookie);
+          let ca = decodedCookie.split(";");
+          for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == " ") {
+              c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+              return c.substring(name.length, c.length);
+            }
+          }
+          return "";
+        } else {
+          let arrObjects = [];
+          let decodedCookie = decodeURIComponent(document.cookie);
+          let ca = decodedCookie.split("; ");
+          for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            let cs = c.split("=");
+            arrObjects[i] = {
+              id: cs[0],
+              count: cs[1],
+            };
+          }
+          return arrObjects;
+        }
+      }
+    </script>
+  </th:block>
+</html>

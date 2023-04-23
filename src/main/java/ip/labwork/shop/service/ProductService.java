@@ -1,5 +1,6 @@
 package ip.labwork.shop.service;
 
+import ip.labwork.shop.controller.ComponentDTO;
 import ip.labwork.shop.controller.ProductDTO;
 import ip.labwork.shop.model.Component;
 import ip.labwork.shop.model.OrderProducts;
@@ -30,9 +31,11 @@ public class ProductService {
         final Product product = new Product(productDTO.getName(), productDTO.getPrice(),productDTO.getImage().getBytes());
         validatorUtil.validate(product);
         productRepository.save(product);
-        for (int i = 0; i < productDTO.getComponentDTOList().size(); i++) {
-            final ProductComponents productComponents = new ProductComponents(componentRepository.findById(productDTO.getComponentDTOList().get(i).getId()).orElseThrow(() -> new ComponentNotFoundException(1L)), product, productDTO.getComponentDTOList().get(i).getCount());
-            product.addComponent(productComponents);
+        if(productDTO.getComponentDTOList() != null){
+            for (int i = 0; i < productDTO.getComponentDTOList().size(); i++) {
+                final ProductComponents productComponents = new ProductComponents(componentRepository.findById(productDTO.getComponentDTOList().get(i).getId()).orElseThrow(() -> new ComponentNotFoundException(1L)), product, productDTO.getComponentDTOList().get(i).getCount());
+                product.addComponent(productComponents);
+            }
         }
         productRepository.save(product);
         return new ProductDTO(findProduct(product.getId()));
@@ -85,6 +88,17 @@ public class ProductService {
         return new ProductDTO(currentProduct);
     }
     @Transactional
+    public ProductDTO updateFields(Long id, ProductDTO product) {
+        final Product currentProduct = findProduct(id);
+        currentProduct.setProductName(product.getName());
+        if (product.getImage().length()>23){
+            currentProduct.setImage(product.getImage().getBytes());
+        }
+        validatorUtil.validate(currentProduct);
+        productRepository.save(currentProduct);
+        return new ProductDTO(currentProduct);
+    }
+    @Transactional
     public ProductDTO deleteProduct(Long id) {
         final Product currentProduct = findProduct(id);
         int size = currentProduct.getComponents().size();
@@ -109,7 +123,44 @@ public class ProductService {
     }
 
     @Transactional
-    public List<Product> findFiltredProducts(Long[] arr) {
-        return productRepository.findAllById(Arrays.stream(arr).toList());
+    public ProductDTO addComponent(Long id, ComponentDTO componentDTO) {
+        if (componentDTO.getCount() <= 0){
+            return null;
+        }
+        final Product currentProduct = findProduct(id);
+        List<ProductComponents> productComponentsList = productRepository.getProductComponent(id);
+        if(productComponentsList.stream().filter(x -> x.getId().getComponentId() == componentDTO.getId()).toList().size() != 0) {
+            final ProductComponents productComponents = productRepository.getProductComponent(id).stream().filter(x -> x.getId().getComponentId().equals(componentDTO.getId())).findFirst().get();
+            currentProduct.removeComponent(productComponents);
+            currentProduct.addComponent(new ProductComponents(componentRepository.findById(componentDTO.getId()).orElseThrow(() -> new ComponentNotFoundException(id)), currentProduct, componentDTO.getCount()));
+        }else{
+            final ProductComponents productComponents = new ProductComponents(componentRepository.findById(componentDTO.getId()).orElseThrow(() -> new ComponentNotFoundException(id)), currentProduct, componentDTO.getCount());
+            currentProduct.addComponent(productComponents);
+        }
+        productRepository.saveAndFlush(currentProduct);
+        int price = 0;
+        for(int i = 0; i < productRepository.getProductComponent(id).size(); i++){
+            price += productRepository.getProductComponent(id).get(i).getComponent().getPrice() * productRepository.getProductComponent(id).get(i).getCount();
+        }
+        currentProduct.setPrice(price);
+        productRepository.saveAndFlush(currentProduct);
+        return new ProductDTO(currentProduct);
+    }
+    @Transactional
+    public ProductDTO deleteComponent(Long id, Long componentId) {
+        Product currentProduct = findProduct(id);
+        final ProductComponents productComponents = productRepository.getProductComponent(id).stream().filter(x -> x.getId().getComponentId().equals(componentId)).findFirst().get();
+        currentProduct.removeComponent(productComponents);
+        Component component = componentRepository.findById(componentId).orElseThrow(() -> new ComponentNotFoundException(componentId));
+        component.removeProduct(productComponents);
+        productRepository.save(currentProduct);
+        currentProduct = findProduct(id);
+        int price = 0;
+        for(int i = 0; i < currentProduct.getComponents().size(); i++){
+            price += currentProduct.getComponents().get(i).getComponent().getPrice() * currentProduct.getComponents().get(i).getCount();
+        }
+        currentProduct.setPrice(price);
+        productRepository.saveAndFlush(currentProduct);
+        return new ProductDTO(currentProduct);
     }
 }

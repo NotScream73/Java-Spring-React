@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  layout:decorate="~{default}"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+>
+  <head> </head>
+  <body>
+    <main class="flex-shrink-0" layout:fragment="content">
+      <div class="btn-group mt-2" role="group">
+        <a
+          type="button"
+          class="btn btn-outline-dark text-center d-flex justify-content-md-center mx-2 mb-3"
+          th:href="@{/product/edit}"
+        >
+          Добавить
+        </a>
+      </div>
+      <div class="temp row row-cols-1 row-cols-md-3 g-4" id="tbl-items">
+        <div
+          class="col"
+          th:each="product, iterator: ${products}"
+          th:key="${product.getId()}"
+        >
+          <div class="card">
+            <div class="container w-100 h-350px">
+              <img
+                alt="Бугер"
+                class="img-fluid rounded mx-auto d-block"
+                style="width: 100%; height: 350px; objectfit: contain"
+                th:src="${product.image}"
+              />
+            </div>
+            <div class="card-body">
+              <h5
+                class="card-title text-center fs-1"
+                th:text="${product.getPrice()}"
+              ></h5>
+              <a
+                class="btn btn-outline-dark text-center d-flex justify-content-md-center mx-5"
+                th:attr="onclick=|confirm('Удалить запись?') && document.getElementById('remove-${product.id}').click()|"
+              >
+                Удалить
+              </a>
+              <a
+                class="btn btn-outline-dark text-center d-flex justify-content-md-center mx-5"
+                th:href="@{/product/edit/{id}(id=${product.id})}"
+                type="button"
+                >Изменить
+              </a>
+              <a
+                class="btn btn-outline-dark text-center d-flex justify-content-md-center mx-5"
+                type="button"
+                th:attr="onclick=|add(${product.id})|"
+              >
+                в корзину
+              </a>
+              <form
+                th:action="@{/product/delete/{id}(id=${product.id})}"
+                method="post"
+              >
+                <button
+                  th:id="'remove-' + ${product.id}"
+                  type="submit"
+                  style="display: none"
+                >
+                  Удалить
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+  <th:block layout:fragment="scripts">
+    <script>
+      function add(name) {
+        let i = getCookie(name);
+        const d = new Date();
+        d.setTime(d.getTime() + 24 * 60 * 60 * 1000);
+        let expires = "expires=" + d.toUTCString();
+        if (i == "") {
+          document.cookie = name + "=" + 1 + ";" + expires + ";path=/";
+        } else {
+          document.cookie =
+            name + "=" + (Number(i) + Number(1)) + ";" + expires + ";path=/";
+        }
+      }
+
+      function getCookie(name) {
+          name = name + "=";
+          let decodedCookie = decodeURIComponent(document.cookie);
+          let ca = decodedCookie.split(";");
+          for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == " ") {
+              c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+              return c.substring(name.length, c.length);
+            }
+          }
+          return "";
+      }
+    </script>
+  </th:block>
+</html>
