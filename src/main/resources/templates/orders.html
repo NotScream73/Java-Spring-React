@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html
+        lang="en"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{default}"
+>
+<head> </head>
+<body>
+<main style="background-color: white" layout:fragment="content">
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Дата оформления</th>
+        <th scope="col">Общая стоимость</th>
+        <th scope="col">Статус</th>
+        <th scope="col"></th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="order, iterator: ${orders}">
+        <th scope="row" th:text="${iterator.index} + 1" />
+        <td th:text="${order.date}" style="width: 60%"/>
+        <td th:text="${order.price}"  />
+        <td th:text="${order.status}" />
+        <td style="width: 10%">
+          <div class="btn-group" role="group" aria-label="Basic example">
+            <a
+                    class="btn btn-warning button-fixed button-sm"
+                    th:href="@{/order/view/{id}(id=${order.id})}"
+            >
+              <i class="fa fa-pencil" aria-hidden="true"></i> Подробнее
+            </a>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+</body>
+</html>
