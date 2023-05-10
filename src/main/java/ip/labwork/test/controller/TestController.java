@@ -1,6 +1,6 @@
 package ip.labwork.test.controller;
 
-import ip.labwork.WebConfiguration;
+import ip.labwork.configuration.WebConfiguration;
 import ip.labwork.test.model.TestDto;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;

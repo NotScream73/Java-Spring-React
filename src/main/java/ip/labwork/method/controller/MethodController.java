@@ -1,6 +1,6 @@
 package ip.labwork.method.controller;
 
-import ip.labwork.WebConfiguration;
+import ip.labwork.configuration.WebConfiguration;
 import ip.labwork.method.service.MethodService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

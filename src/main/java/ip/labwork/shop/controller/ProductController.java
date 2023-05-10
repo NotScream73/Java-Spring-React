@@ -1,6 +1,6 @@
 package ip.labwork.shop.controller;
 
-import ip.labwork.WebConfiguration;
+import ip.labwork.configuration.WebConfiguration;
 import ip.labwork.shop.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;

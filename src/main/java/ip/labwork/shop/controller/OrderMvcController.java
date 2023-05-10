@@ -3,6 +3,7 @@ package ip.labwork.shop.controller;
 import ip.labwork.shop.model.OrderStatus;
 import ip.labwork.shop.service.OrderService;
 import ip.labwork.shop.service.ProductService;
+import ip.labwork.user.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,9 +21,11 @@ import java.util.List;
 public class OrderMvcController {
     private final OrderService orderService;
     private final ProductService productService;
-    public OrderMvcController(OrderService orderService, ProductService productService) {
+    private final UserService userService;
+    public OrderMvcController(OrderService orderService, ProductService productService, UserService userService) {
         this.orderService = orderService;
         this.productService = productService;
+        this.userService = userService;
     }
     @GetMapping
     public String getOrders(HttpServletRequest request,
@@ -45,7 +49,7 @@ public class OrderMvcController {
     }
     @PostMapping
     public String createOrder(HttpServletRequest request,
-                              HttpServletResponse response) {
+                              HttpServletResponse response, Principal principal) {
         Cookie[] cookies = request.getCookies();
         OrderDTO orderDTO = new OrderDTO();
         List<ProductDTO> productDTOS = new ArrayList<>();
@@ -60,13 +64,14 @@ public class OrderMvcController {
         orderDTO.setPrice(totalPrice);
         orderDTO.setProductDTOList(productDTOS);
         orderDTO.setStatus(OrderStatus.Готов);
+        orderDTO.setUser_id(userService.findByLogin(principal.getName()).getId());
         orderService.create(orderDTO);
         response.addCookie(new Cookie("delete",""));
         return "redirect:/order";
     }
     @GetMapping(value = {"/all"})
-    public String getOrders(Model model) {
-        model.addAttribute("orders", orderService.findAllOrder());
+    public String getOrders(Model model, Principal principal) {
+        model.addAttribute("orders", orderService.findFiltredOrder(userService.findByLogin(principal.getName()).getId()));
         return "orders";
     }
 

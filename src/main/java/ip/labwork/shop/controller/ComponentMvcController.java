@@ -1,7 +1,9 @@
 package ip.labwork.shop.controller;
 
 import ip.labwork.shop.service.ComponentService;
+import ip.labwork.user.model.UserRole;
 import jakarta.validation.Valid;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,11 +18,13 @@ public class ComponentMvcController {
         this.componentService = componentService;
     }
     @GetMapping
+    @Secured({UserRole.AsString.ADMIN})
     public String getComponents(Model model) {
         model.addAttribute("components", componentService.findAllComponent());
         return "component";
     }
     @GetMapping(value = {"/edit", "/edit/{id}"})
+    @Secured({UserRole.AsString.ADMIN})
     public String editComponent(@PathVariable(required = false) Long id,
                                 Model model) {
         if (id == null || id <= 0) {

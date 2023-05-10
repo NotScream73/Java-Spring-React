@@ -2,7 +2,9 @@ package ip.labwork.shop.controller;
 
 import ip.labwork.shop.service.ComponentService;
 import ip.labwork.shop.service.ProductService;
+import ip.labwork.user.model.UserRole;
 import jakarta.validation.Valid;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -27,6 +29,7 @@ public class ProductMvcController {
         return "product";
     }
     @GetMapping(value = {"/edit", "/edit/{id}"})
+    @Secured({UserRole.AsString.ADMIN})
     public String editProduct(@PathVariable(required = false) Long id,
                               Model model) {
         if (id == null || id <= 0) {

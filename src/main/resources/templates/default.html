@@ -3,6 +3,7 @@
   lang="ru"
   xmlns:th="http://www.thymeleaf.org"
   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
 >
   <head>
     <meta charset="UTF-8" />
@@ -38,14 +39,18 @@
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              <a class="nav-link fs-4 text-black" href="/component"
-                >Компоненты</a
-              >
-              <a class="nav-link fs-4 text-black" href="/product">Продукты</a>
-              <a class="nav-link fs-4 text-black" href="/order">Заказы</a>
-              <a class="nav-link fs-4 text-black" href="/order/all">История заказов</a>
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0" th:with="activeLink=${#ctx.springRequestContext.requestUri}" sec:authorize="isAuthenticated()">
+              <a class="nav-link fs-4 text-black" sec:authorize="hasRole('ROLE_ADMIN')" href="/component" th:classappend="${#strings.equals(activeLink, '/component')} ? 'active' : ''">Компоненты</a>
+              <a class="nav-link fs-4 text-black" href="/product" th:classappend="${#strings.equals(activeLink, '/product')} ? 'active' : ''">Продукты</a>
+              <a class="nav-link fs-4 text-black" href="/order" th:classappend="${#strings.equals(activeLink, '/order')} ? 'active' : ''">Заказы</a>
+              <a class="nav-link fs-4 text-black" href="/order/all" th:classappend="${#strings.equals(activeLink, '/order/all')} ? 'active' : ''">История заказов</a>
+              <a sec:authorize="hasRole('ROLE_ADMIN')" class="nav-link fs-4 text-black" href="/users"
+                 th:classappend="${#strings.equals(activeLink, '/users')} ? 'active' : ''">Пользователи</a>
+              <a class="nav-link fs-4 text-black" href="/logout">
+                Выход (<span th:text="${#authentication.name}"></span>)
+              </a>
             </ul>
+
           </div>
         </div>
       </nav>

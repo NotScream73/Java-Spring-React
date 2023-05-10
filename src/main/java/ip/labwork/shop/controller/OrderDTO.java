@@ -14,6 +14,7 @@ public class OrderDTO {
     private Date date = new Date();
     @NotBlank(message = "Price can't be null or empty")
     private int price;
+    private long user_id;
     private OrderStatus status = OrderStatus.Неизвестен;
     private List<ProductDTO> productDTOList;
     public OrderDTO(Order order) {
@@ -25,6 +26,7 @@ public class OrderDTO {
                 .map(y -> new ProductDTO(y.getProduct(), y.getCount()))
                 .toList();
         this.status = Objects.equals(order.getStatus().toString(), "") ? OrderStatus.Неизвестен : order.getStatus();
+        this.user_id = order.getUser_id() == null ? -1 : order.getUser_id();
     }
 
     public OrderDTO() {
@@ -68,5 +70,13 @@ public class OrderDTO {
 
     public void setProductDTOList(List<ProductDTO> productDTOList) {
         this.productDTOList = productDTOList;
+    }
+
+    public long getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(long user_id) {
+        this.user_id = user_id;
     }
 }

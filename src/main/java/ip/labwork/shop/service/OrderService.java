@@ -28,7 +28,7 @@ public class OrderService {
         for(int i = 0; i < orderDTO.getProductDTOList().size(); i++){
             price += orderDTO.getProductDTOList().get(i).getPrice() * orderDTO.getProductDTOList().get(i).getCount();
         }
-        final Order order = new Order(new Date(), price, orderDTO.getStatus());
+        final Order order = new Order(new Date(), price, orderDTO.getStatus(), orderDTO.getUser_id());
         validatorUtil.validate(order);
         orderRepository.save(order);
         for (int i = 0; i < orderDTO.getProductDTOList().size(); i++) {
@@ -46,6 +46,11 @@ public class OrderService {
     @Transactional(readOnly = true)
     public List<OrderDTO> findAllOrder() {
         return orderRepository.findAll().stream().map(x -> new OrderDTO(x)).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<OrderDTO> findFiltredOrder(long userid) {
+        return orderRepository.getOrdersByUser_id(userid).stream().map(x -> new OrderDTO(x)).toList();
     }
     @Transactional
     public OrderDTO update(Long id, OrderDTO orderDTO) {

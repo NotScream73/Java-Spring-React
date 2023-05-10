@@ -3,6 +3,7 @@
   lang="en"
   layout:decorate="~{default}"
   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
 >
   <head> </head>
   <body>
@@ -12,6 +13,7 @@
           type="button"
           class="btn btn-outline-dark text-center d-flex justify-content-md-center mx-2 mb-3"
           th:href="@{/product/edit}"
+          sec:authorize="hasRole('ROLE_ADMIN')"
         >
           Добавить
         </a>
@@ -39,13 +41,14 @@
               <a
                 class="btn btn-outline-dark text-center d-flex justify-content-md-center mx-5"
                 th:attr="onclick=|confirm('Удалить запись?') && document.getElementById('remove-${product.id}').click()|"
+                sec:authorize="hasRole('ROLE_ADMIN')"
               >
                 Удалить
               </a>
               <a
                 class="btn btn-outline-dark text-center d-flex justify-content-md-center mx-5"
                 th:href="@{/product/edit/{id}(id=${product.id})}"
-                type="button"
+                type="button" sec:authorize="hasRole('ROLE_ADMIN')"
                 >Изменить
               </a>
               <a
@@ -62,7 +65,7 @@
                 <button
                   th:id="'remove-' + ${product.id}"
                   type="submit"
-                  style="display: none"
+                  style="display: none" sec:authorize="hasRole('ROLE_ADMIN')"
                 >
                   Удалить
                 </button>
