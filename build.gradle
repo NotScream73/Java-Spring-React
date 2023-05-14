@@ -1,7 +1,7 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.0.2'
-	id 'io.spring.dependency-management' version '1.1.0'
+    id 'java'
+    id 'org.springframework.boot' version '3.0.2'
+    id 'io.spring.dependency-management' version '1.1.0'
 }
 
 group = 'ip'
@@ -9,26 +9,30 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 jar {
-	enabled = false
+    enabled = false
 }
 
 dependencies {
-	implementation(project(':front'))
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'com.h2database:h2:2.1.210'
-	implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.5'
-	implementation 'org.hibernate.validator:hibernate-validator'
-	implementation group: 'org.springframework', name: 'spring-tx'
-	implementation 'org.springdoc:springdoc-openapi-ui:1.6.5'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation(project(':front'))
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'com.h2database:h2:2.1.210'
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.5'
+    implementation 'org.hibernate.validator:hibernate-validator'
+    implementation group: 'org.springframework', name: 'spring-tx'
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.5'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'com.auth0:java-jwt:4.4.0'
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }

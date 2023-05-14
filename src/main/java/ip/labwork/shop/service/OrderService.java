@@ -1,9 +1,12 @@
 package ip.labwork.shop.service;
 
 import ip.labwork.shop.controller.OrderDTO;
-import ip.labwork.shop.model.*;
+import ip.labwork.shop.model.Order;
+import ip.labwork.shop.model.OrderProducts;
+import ip.labwork.shop.model.Product;
 import ip.labwork.shop.repository.OrderRepository;
 import ip.labwork.shop.repository.ProductRepository;
+import ip.labwork.user.service.UserService;
 import ip.labwork.util.validation.ValidatorUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,21 +17,24 @@ import java.util.*;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
+    private final UserService userService;
     private final ValidatorUtil validatorUtil;
 
     public OrderService(OrderRepository orderRepository,
-                            ValidatorUtil validatorUtil, ProductRepository productRepository) {
+                        ValidatorUtil validatorUtil, ProductRepository productRepository, UserService userService) {
         this.orderRepository = orderRepository;
         this.validatorUtil = validatorUtil;
         this.productRepository = productRepository;
+        this.userService = userService;
     }
+
     @Transactional
     public OrderDTO create(OrderDTO orderDTO) {
         int price = 0;
-        for(int i = 0; i < orderDTO.getProductDTOList().size(); i++){
+        for (int i = 0; i < orderDTO.getProductDTOList().size(); i++) {
             price += orderDTO.getProductDTOList().get(i).getPrice() * orderDTO.getProductDTOList().get(i).getCount();
         }
-        final Order order = new Order(new Date(), price, orderDTO.getStatus());
+        final Order order = new Order(new Date(), price, orderDTO.getStatus(), userService.findByLogin(orderDTO.getUser()).getId());
         validatorUtil.validate(order);
         orderRepository.save(order);
         for (int i = 0; i < orderDTO.getProductDTOList().size(); i++) {
@@ -38,15 +44,23 @@ public class OrderService {
         orderRepository.save(order);
         return new OrderDTO(findOrder(order.getId()));
     }
+
     @Transactional(readOnly = true)
     public Order findOrder(Long id) {
         final Optional<Order> order = orderRepository.findById(id);
         return order.orElseThrow(() -> new OrderNotFoundException(id));
     }
+
     @Transactional(readOnly = true)
     public List<OrderDTO> findAllOrder() {
         return orderRepository.findAll().stream().map(x -> new OrderDTO(x)).toList();
     }
+
+    @Transactional(readOnly = true)
+    public List<OrderDTO> findFiltredOrder(String login) {
+        return orderRepository.findAll().stream().filter(x -> Objects.equals(x.getUser_id(), userService.findByLogin(login).getId())).map(x -> new OrderDTO(x)).toList();
+    }
+
     @Transactional
     public OrderDTO update(Long id, OrderDTO orderDTO) {
         final Order currentOrder = findOrder(id);
@@ -68,8 +82,7 @@ public class OrderService {
                 product_id = product_id.stream().filter(x -> !Objects.equals(x, newProducts.get(finalI).getId())).toList();
                 orderProducts.setCount(orderDTO.getProductDTOList().stream().filter(x -> x.getId() == currentId).toList().get(0).getCount());
                 orderRepository.saveAndFlush(currentOrder);
-            }
-            else {
+            } else {
                 final OrderProducts orderProducts = new OrderProducts(currentOrder, newProducts.get(i), orderDTO.getProductDTOList().stream().filter(x -> x.getId() == currentId).toList().get(0).getCount());
                 currentOrder.addProduct(orderProducts);
                 orderRepository.saveAndFlush(currentOrder);
@@ -82,6 +95,7 @@ public class OrderService {
         orderRepository.saveAndFlush(currentOrder);
         return new OrderDTO(currentOrder);
     }
+
     @Transactional
     public OrderDTO deleteOrder(Long id) {
         final Order currentOrder = findOrder(id);
@@ -94,6 +108,7 @@ public class OrderService {
         orderRepository.delete(currentOrder);
         return new OrderDTO(currentOrder);
     }
+
     @Transactional
     public void deleteAllOrder() {
         orderRepository.deleteAll();

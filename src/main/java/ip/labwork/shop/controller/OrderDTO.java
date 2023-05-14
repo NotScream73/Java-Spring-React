@@ -11,8 +11,11 @@ public class OrderDTO {
     private long id;
     private Date date = new Date();
     private int price;
+    private long user_id;
+    private String user;
     private OrderStatus status = OrderStatus.Неизвестен;
     private List<ProductDTO> productDTOList;
+
     public OrderDTO(Order order) {
         this.id = order.getId();
         this.date = order.getDate();
@@ -22,6 +25,7 @@ public class OrderDTO {
                 .map(y -> new ProductDTO(y.getProduct(), y.getCount()))
                 .toList();
         this.status = Objects.equals(order.getStatus().toString(), "") ? OrderStatus.Неизвестен : order.getStatus();
+        this.user_id = order.getUser_id() == null ? -1 : order.getUser_id();
     }
 
     public OrderDTO() {
@@ -53,6 +57,22 @@ public class OrderDTO {
 
     public void setStatus(OrderStatus status) {
         this.status = status;
+    }
+
+    public long getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(long user_id) {
+        this.user_id = user_id;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
     }
 
     public List<ProductDTO> getProductDTOList() {

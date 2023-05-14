@@ -16,7 +16,7 @@ export default function CatalogHistory(props) {
     }, []);
 
     function loadItems() {
-        DataService.readAll(props.getAllUrl, props.transformer)
+        DataService.readAllOrders(props.getAllUrl+`/all/${localStorage.getItem("user")}`, props.transformer)
             .then(data => setItems(data));
     }
 

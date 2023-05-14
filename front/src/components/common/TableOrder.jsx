@@ -44,7 +44,7 @@ export default function TableOrder(props) {
     }
   }
   async function acceptOrder(){
-    await DataService.create("/order",{...order, ["price"]:cost, ["status"]: "1"} ).then(data => {
+    await DataService.create("/order",{...order, ["price"]:cost, ["status"]: "1", ["user"]:localStorage.getItem("user")} ).then(data => {
       props.setProduct([]);
       setCost(0);
     });

@@ -1,7 +1,9 @@
 package ip.labwork.shop.controller;
 
 import ip.labwork.shop.service.ProductService;
+import ip.labwork.user.model.UserRole;
 import jakarta.validation.Valid;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,27 +18,38 @@ public class ProductController {
     }
 
     @PostMapping
-    public ProductDTO createProduct(@RequestBody @Valid ProductDTO productDTO){
+    @Secured({UserRole.AsString.ADMIN})
+    public ProductDTO createProduct(@RequestBody @Valid ProductDTO productDTO) {
         return productService.create(productDTO);
     }
+
     @PutMapping("/{id}")
-    public ProductDTO updateProduct(@PathVariable Long id,@RequestBody @Valid ProductDTO productDTO){
+    @Secured({UserRole.AsString.ADMIN})
+    public ProductDTO updateProduct(@PathVariable Long id, @RequestBody @Valid ProductDTO productDTO) {
         return productService.updateProduct(id, productDTO);
     }
+
     @DeleteMapping("/{id}")
-    public ProductDTO removeProduct(@PathVariable Long id){
+    @Secured({UserRole.AsString.ADMIN})
+    public ProductDTO removeProduct(@PathVariable Long id) {
         return productService.deleteProduct(id);
     }
+
     @DeleteMapping
-    public void removeAllProduct(){
+    @Secured({UserRole.AsString.ADMIN})
+    public void removeAllProduct() {
         productService.deleteAllProduct();
     }
+
     @GetMapping("/{id}")
-    public ProductDTO findProduct(@PathVariable Long id){
+    @Secured({UserRole.AsString.ADMIN})
+    public ProductDTO findProduct(@PathVariable Long id) {
         return new ProductDTO(productService.findProduct(id));
     }
+
     @GetMapping
-    public List<ProductDTO> findAllProduct(){
+    @Secured({UserRole.AsString.ADMIN})
+    public List<ProductDTO> findAllProduct() {
         return productService.findAllProduct();
     }
 }

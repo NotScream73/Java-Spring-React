@@ -5,5 +5,6 @@ export default class Order {
         this.price = data?.price || 0;
         this.productDTOList = data?.productDTOList || [];
         this.status = data?.status || "0";
+        this.user = data?.user || "";
     }
 }

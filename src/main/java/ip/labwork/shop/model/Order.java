@@ -20,16 +20,19 @@ public class Order {
     @NotNull(message = "Price can't be null or empty")
     @Column(name = "price")
     private Integer price;
+    private Long user_id;
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<OrderProducts> products;
     private OrderStatus status;
-    public Order(){
+
+    public Order() {
 
     }
 
-    public Order(Date date, Integer price, OrderStatus status) {
+    public Order(Date date, Integer price, OrderStatus status, Long user_id) {
         this.date = date;
         this.price = price;
+        this.user_id = user_id;
         this.status = status;
     }
 
@@ -56,6 +59,7 @@ public class Order {
     public void setPrice(Integer price) {
         this.price = price;
     }
+
     public List<OrderProducts> getProducts() {
         return products;
     }
@@ -64,14 +68,15 @@ public class Order {
         this.products = products;
     }
 
-    public void addProduct(OrderProducts orderProducts){
-        if  (products == null){
+    public void addProduct(OrderProducts orderProducts) {
+        if (products == null) {
             this.products = new ArrayList<>();
         }
         if (!products.contains(orderProducts))
             this.products.add(orderProducts);
     }
-    public void removeProducts(OrderProducts orderProducts){
+
+    public void removeProducts(OrderProducts orderProducts) {
         if (products.contains(orderProducts))
             this.products.remove(orderProducts);
     }
@@ -84,11 +89,19 @@ public class Order {
         this.status = status;
     }
 
+    public Long getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(Long user_id) {
+        this.user_id = user_id;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Order order)) return false;
-        return Objects.equals(getId(), order.getId()) && Objects.equals(getDate(), order.getDate()) && Objects.equals(getPrice(), order.getPrice());
+        return Objects.equals(getId(), order.getId()) && Objects.equals(getDate(), order.getDate()) && Objects.equals(getPrice(), order.getPrice()) && Objects.equals(getUser_id(), order.getUser_id()) && Objects.equals(getProducts(), order.getProducts()) && getStatus() == order.getStatus();
     }
 
     @Override
